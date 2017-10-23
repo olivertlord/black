@@ -1,9 +1,18 @@
+% *** BLACK VERSION 6: BY OLIVER T. LORD **********************************
+% *************************************************************************
+
+% Software for the fitting of spectroradiometric data to determine
+% temperature cross-sections in both real-time and post-hoc.
+
+% *************************************************************************
+
+% --- Main GUI script -----------------------------------------------------
+
 function varargout = black(varargin)
-
 % BLACK M-file for black.fig
-% Last Modified by GUIDE v2.5 04-Dec-2013 11:16:33
 
-% Begin initialization code - DO NOT EDIT
+% --- Initialization code - DO NOT EDIT -----------------------------------
+
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -20,625 +29,464 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-% End initialization code - DO NOT EDIT
 
-function black_OpeningFcn(hObject, eventdata, handles, varargin)
-handles.output = hObject;
-guidata(hObject, handles);
+% --- Executes just before IRS is made visible. ---------------------------
 
-function varargout = black_OutputFcn(hObject, eventdata, handles) 
-varargout{1} = handles.output;
+function black_OpeningFcn(hObject, ~, handles, varargin)
 
-set(handles.edit7,'string','570');
-set(handles.edit8,'string','830');
-set(handles.edit9,'string','160');
-set(handles.edit10,'string','200');
-set(handles.edit15,'string','570');
-set(handles.edit16,'string','830');
-set(handles.edit17,'string','60');
-set(handles.edit18,'string','100');
-set(handles.edit21,'string','1');
-set(handles.edit22,'string','1');
-set(handles.edit2,'string','.SPE');
-set(handles.edit12,'string','.SPE');
-set(handles.edit20,'string','.SPE');
-set(handles.radiobutton1,'value',0);
+arrayfun(@cla,findall(0,'type','axes'));
+setappdata(0,'increment_flag',0);
+setappdata(0,'auto_flag',0);
+% Clears all figures and initialises flags
+
+set(gcf, 'MenuBar', 'none');
+set(gcf, 'ToolBar', 'none');
+% Hides menubar and toolbar in figure window
+
+axes(handles.axes1)
+plot_axes('w', 'j', 'Wien Fits')
+axes(handles.axes2)
+plot_axes('w', 'j', 'Wien Fits')
+axes(handles.axes3)
+plot_axes('pixels', 'Temperature (K)', '')
+axes(handles.axes4)
+plot_axes('pixels', 'Temperature (K)', '')
+axes(handles.axes5)
+plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History')
+axes(handles.axes6)
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation')
+axes(handles.axes7)
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation')
+axes(handles.axes8)
+plot_axes('pixels', '', '')
+axes(handles.axes9)
+plot_axes('pixels', '', '')
+axes(handles.axes10)
+plot_axes('pixels', 'pixels', 'RAW CCD IMAGE')
+% Sets titles and labels of figures by calling function plot_axes
 
 colers=char('r','g','b','c','m','b');
 setappdata(0,'colers',colers);
+% Sets up global plot color list
 
-function pushbutton1_Callback(hObject, eventdata, handles)
+setappdata(0,'ccnt',1);
+% Initialises global color counter
 
-[cfilel,cpathl]=uigetfile('c:\MATLAB7\blackv5\calfiles\.spe','Winspec Calibration File');
+% Choose default command line output for IRS
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% --- Outputs from this function are returned to the command line. --------
+
+function varargout = black_OutputFcn(~, ~, handles) 
+
+varargout{1} = handles.output;
+
+% --- Create functions: Execute during object creation, after setting all -
+% properties --------------------------------------------------------------
+
+function edit2_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit7_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit8_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit9_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit10_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit12_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit15_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit16_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit17_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit18_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit20_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit21_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+function edit22_CreateFcn(hObject, ~, ~)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+% --- Callback functions with no content ----------------------------------
+
+function edit2_Callback(~, ~, ~) %#ok<*DEFNU>
+function edit12_Callback(~, ~, ~)
+function edit20_Callback(~, ~, ~)
+function edit21_Callback(~, ~, ~)
+function edit22_Callback(~, ~, ~)
+function radiobutton1_Callback(~,~,~)
+function radiobutton2_Callback(~,~,~)
+function radiobutton6_Callback(~,~,~)
+function radiobutton8_Callback(~, ~, ~)
+function radiobutton34_Callback(~, ~, ~)
+function popupmenu1_Callback(~, ~, ~)
+
+% --- Callback  functions with content ------------------------------------
+
+function edit7_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+function edit8_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+function edit9_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+function edit10_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+function edit15_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+function edit16_Callback(~, ~, handles)
+
+ROI(handles)
+
+function edit17_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+function edit18_Callback(~, ~, handles)
+
+ROI(handles)
+% Updates ROI boxes by calling function ROI
+
+% --- User sets left hand calibraton file ---------------------------------
+function pushbutton1_Callback(~, ~, handles)
+
+cfilel = uigetfile('./calfiles/*.SPE','Winspec Calibration File');
 set(handles.edit2,'string',cfilel);
-setappdata(0,'cpathl',cpathl);
 
-function edit2_Callback(hObject, eventdata, handles)
+% --- User sets right hand calibraton file --------------------------------
+function pushbutton5_Callback(~, ~, handles)
 
-function edit2_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function pushbutton2_Callback(hObject, eventdata, handles)
-
-function edit3_Callback(hObject, eventdata, handles)
-
-function edit3_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function pushbutton3_Callback(hObject, eventdata, handles)
-
-function edit4_Callback(hObject, eventdata, handles)
-
-function edit4_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function pushbutton4_Callback(hObject, eventdata, handles)
-
-function edit5_Callback(hObject, eventdata, handles)
-
-function edit5_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit6_Callback(hObject, eventdata, handles)
-
-function edit6_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit7_Callback(hObject, eventdata, handles)
-
-function edit7_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit8_Callback(hObject, eventdata, handles)
-
-function edit8_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit9_Callback(hObject, eventdata, handles)
-
-function edit9_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit10_Callback(hObject, eventdata, handles)
-
-function edit10_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit11_Callback(hObject, eventdata, handles)
-
-function edit11_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function pushbutton5_Callback(hObject, eventdata, handles)
-
-[cfiler,cpathr]=uigetfile('c:\MATLAB7\blackv5\calfiles\.spe','Winspec Calibration File');
+cfiler = uigetfile('./calfiles/*.SPE','Winspec Calibration File');
 set(handles.edit12,'string',cfiler);
-setappdata(0,'cpathr',cpathr);
 
-function edit12_Callback(hObject, eventdata, handles)
+% --- User sets unknown file ----------------------------------------------
+function pushbutton29_Callback(~, ~, handles)
 
-function edit12_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function pushbutton6_Callback(hObject, eventdata, handles)
-
-function edit13_Callback(hObject, eventdata, handles)
-
-function edit13_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit14_Callback(hObject, eventdata, handles)
-
-function edit14_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit15_Callback(hObject, eventdata, handles)
-
-function edit15_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit16_Callback(hObject, eventdata, handles)
-
-function edit16_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit17_Callback(hObject, eventdata, handles)
-
-function edit17_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit18_Callback(hObject, eventdata, handles)
-
-function edit18_CreateFcn(hObject, eventdata, handles)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function pushbutton29_Callback(hObject, eventdata, handles)
-
-[unkfile,upath]=uigetfile('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File');
-set(handles.edit20,'string',unkfile);
+[ufile,upath]=uigetfile('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File');
+set(handles.edit20,'string',ufile);
 setappdata(0,'upath',upath);
-ccnt=1;
-setappdata(0,'ccnt',ccnt);
+% User selects file, apply name to GUI box, add path to appdata for later
+% use
 
-function edit20_Callback(hObject, eventdata, handles)
+[~, filenumber, ~] = file_enumerator (upath, ufile);
+% Function enumerator called to determine filenumber from filename
 
-function edit20_CreateFcn(hObject, eventdata, handles)
+set(handles.edit22,'string',filenumber);
+set(handles.edit21,'string',filenumber);
+% Set initial and last file number boxes in GUI
 
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+% --- FILE RANGE MODE - FIT BUTTON-----------------------------------------
+function pushbutton30_Callback(~, ~, handles)
+
+if getappdata(0,'auto_flag') < 2 && get(handles.radiobutton41,'Value') == 0
+    arrayfun(@cla,findall(0,'type','axes'));
 end
+% Clear all plots within GUI
 
-function edit21_Callback(hObject, eventdata, handles)
+ufile = get(handles.edit20,'string');
+% Get name of unknown file from GUI box
 
-function edit21_CreateFcn(hObject, eventdata, handles)
+upath = getappdata(0,'upath');
+% Get path from appdata
 
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+[filelist, filenumber, prefix] = file_enumerator (upath, ufile);
+% Call enumerator to extract complete file listing 
 
-function pushbutton40_Callback(hObject, eventdata, handles)
-
-[spec, grat, conp, pix1, pix2, conl, lam1, lam2] = specset;
-
-setappdata(0,'spec',spec);
-setappdata(0,'conp',conp);
-setappdata(0,'pix1',pix1);
-setappdata(0,'pix2',pix2);
-setappdata(0,'conl',conl);
-setappdata(0,'lam1',lam1);
-setappdata(0,'lam2',lam2);
-
-if spec == 2;
-    set(handles.edit10,'string','128');
-    set(handles.edit18,'string','128');
-end;
-
-if spec == 3;
-    set(handles.edit10,'string','124');
-    set(handles.edit18,'string','124');
-end;
-
-if spec == 4;
-    set(handles.edit10,'string','100');
-    set(handles.edit18,'string','100');
-end;
-
-function pushbutton30_Callback(hObject, eventdata, handles)
-
-worp = 1;
-setappdata(0,'worp',worp);
-ff=1;
-setappdata(0,'ff',ff);
-
-fi = eval(get(handles.edit21,'string'));
-fl = eval(get(handles.edit22,'string'));
-if fl>1
-    scrsz = get(0,'ScreenSize');
-    figure(4)
-    %set(4,'Name', 'Temperature vs. Acquisition', 'Position', [5 552 650 500]);
-    set(4,'Name', 'Temperature vs. Acquisition', 'Position', [5 552 650 500],'Menubar','none','Toolbar','none');
-    %setAlwaysOnTop(4,true);
-end;
+fi = eval(get(handles.edit22,'string'));
+fl = eval(get(handles.edit21,'string'));
+% Get file range fro GUI boxes
 
 if fl<fi
-    fl = fi + 1;
-    set(handles.edit22,'string',fl);
-end;
+    fl = fi;
+    set(handles.edit21,'string',fl);
+end
+% Catches fl<fi user input error
 
-ufile = get(handles.edit20,'string');
-[y, ufile_end] = size(ufile);
-ufile_end = ufile_end-4;
-num1 = str2num(ufile(ufile_end));
-num2 = str2num(ufile(ufile_end-1));
-num3 = str2num(ufile(ufile_end-2));
-stepback = 3;
-if isempty(num3) == 1;
-    num3 = 0;
-    stepback = 2;
-end;
-if isempty(num2) == 1;
-    num2 = 0;
-    stepback = 1;
-end;
-check_number = num1+(num2*10)+(num3*100);
-
-if (fl>1) & (check_number~=fi);
-    new_str = num2str(fi);
-    old_file = ufile(1:(ufile_end-stepback));
-    ufile = horzcat(old_file,new_str,'.SPE');
+if (fl>1) && (filenumber~=fi)
+    ufile = horzcat(prefix,fi,'.SPE');
     set(handles.edit20,'string',ufile);
-end;
- 
-warning off all
+end
+% Changes filename if it does not match fi
 
-[automnll, automxll, automnlr, automxlr, timevalue, elapsedSecNorm, mintempl, mintempr, stdtempl, stdtempr, avel, aver, errpeakl, errpeakr, cnt, col, lamp, divby, row, templ, jl, etempl, deltal, tempr, jr, etempr, deltar, omega, mnrowl, mxrowl, mnrowr, mxrowr, mnll, mxll, mnlr, mxlr, ninl, ninr, maxtempl, maxtempr, code, ccnt] = wiencalc4(handles, fi, fl);
+if get(handles.radiobutton41,'Value') == 1
+    
+    if fl ~= fi
+        history_length = length(filelist(filelist>=fi & filelist<=fl));
+        setappdata(0,'history_length',history_length);
+    end
+    % If user previously fitted a file range, determine the length of that
+    % range to ensure persistent variables are not overwritten
+    
+    [fl, fi] = deal(fl + 1);
+    % Sets GUI boxes to the next file number
+    
+    while fl < max(filelist(:)) && ~ismember(fl,filelist)
+        [fl, fi] = deal(fl + 1);
+    end
+    % Skips over missing files
+    
+    if fl > max(filelist(:))
+        [fl, fi] = deal(max(filelist(:)));
+    end
+    % Prevents user incrmenting beyond max file number in directory
+    
+    ufile = horzcat(prefix,fi,'.SPE');
+    set(handles.edit20,'string',ufile);
+    set(handles.edit22,'string',fi);
+    set(handles.edit21,'string',fl);
+    % Updates GUI boxes to new values
+    
+elseif get(handles.radiobutton41,'Value') == 0 && fi == fl
+    
+    history_length = -1;
+    setappdata(0,'history_length',history_length);
+    % Sets history_length to special value -1 in unique situation in which
+    % user executes a non-incrementing Wien Fit to a single file
 
-if ccnt == 6;
-    ccnt = 1;
-else ccnt = ccnt+1;
-end;
+else
+    
+    history_length = 0;
+    setappdata(0,'history_length',history_length);
+    % Sets history_length to zero in all other cases; i.e. if increment
+    % button is not checked and fi ~= fl
+    
+end
+% Increments current file by one if user has selected radiobutton
 
-setappdata(0,'ccnt',ccnt');
-setappdata(0,'ninl',ninl);
-setappdata(0,'ninr',ninr);
-setappdata(0,'mnrowl',mnrowl);
-setappdata(0,'mxrowl', mxrowl);
-setappdata(0,'mnrowr',mnrowr);
-setappdata(0,'mxrowr',mxrowr);
-setappdata(0,'omega',omega);
-setappdata(0,'divby',divby);
-setappdata(0,'lamp',lamp);
-setappdata(0,'col',col);
-setappdata(0,'row',row);
-setappdata(0,'cnt',row);
-setappdata(0,'deltal',deltal);
-setappdata(0,'templ',templ);
-setappdata(0,'deltar',deltar);
-setappdata(0,'tempr',tempr);
-setappdata(0,'jl',jl);
-setappdata(0,'jr',jr);
+[savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix); %#ok<ASGLU>
+% Calls Tcalc
 
-result = [code', timevalue',elapsedSecNorm',maxtempl',errpeakl',avel',stdtempl',automnll',automxll',maxtempr',errpeakr',aver',stdtempr',automnlr',automxlr'];
+result_file = char(strcat(upath,'/',savename,'_summary.txt'));
+save(result_file,'result','-ASCII','-double');
+% Saves summary data to text file
 
-assignin('base', 'result', result);
+% --- CLEAR FIGURES BUTTON ------------------------------------------------
 
-function pushbutton31_Callback(hObject, eventdata, handles)
+function pushbutton35_Callback(~, ~, ~)
+arrayfun(@cla,findall(0,'type','axes'))
 
-ff=1;
-setappdata(0,'ff',ff);
+% --- EXIT BUTTON ---------------------------------------------------------
 
-ccnt = getappdata(0,'ccnt');
-
-if ccnt == 6;
-    ccnt = 1;
-else ccnt = ccnt+1;
-end;
-
-[wra, win, templ, deltal, tempr, deltar, omega, jr, jl] = emin (ccnt, handles);
-
-setappdata(0,'deltal',deltal);
-setappdata(0,'templ',templ);
-setappdata(0,'deltar',deltar);
-setappdata(0,'tempr',tempr);
-setappdata(0,'jl',jl);
-setappdata(0,'jr',jr);
-
-function pushbutton32_Callback(hObject, eventdata, handles)
-
-worp = 0;
-setappdata(0,'worp',worp);
-ff=2;
-setappdata(0,'ff',ff);
-
-[w, row, templ, deltal, tempr, deltar, omega, mnrowl, mxrowl, mnrowr, mxrowr, mnll, mxll, mnlr, mxlr, ninl, ninr, nincall, nincalr] = planckcalc (handles);
-
-if ccnt == 6;
-    ccnt = 1;
-else ccnt = ccnt+1;
-end;
-setappdata(0,'ccnt',ccnt');
-
-setappdata(0,'w',w);
-setappdata(0,'ninl',ninl);
-setappdata(0,'ninr',ninr);
-setappdata(0,'mnrowl',mnrowl);
-setappdata(0,'mxrowl', mxrowl);
-setappdata(0,'mnrowr',mnrowr);
-setappdata(0,'mxrowr',mxrowr);
-setappdata(0,'omega',omega);
-setappdata(0,'row',row);
-setappdata(0,'cnt',row);
-setappdata(0,'deltal',deltal);
-setappdata(0,'templ',templ);
-setappdata(0,'deltar',deltar);
-setappdata(0,'tempr',tempr);
-setappdata(0,'nincall',nincall);
-setappdata(0,'nincalr',nincalr);
-
-function pushbutton33_Callback(hObject, eventdata, handles)
-
-ff=2;
-setappdata(0,'ff',ff);
-
-ninl = getappdata(0,'ninl');
-ninr = getappdata(0,'ninr');
-mnrowl = getappdata(0,'mnrowl');
-mxrowl = getappdata(0,'mxrowl');
-mnrowr = getappdata(0,'mnrowr');
-mxrowr = getappdata(0,'mxrowr');
-divby = getappdata(0,'divby');
-omega = getappdata(0,'omega');
-lamp = getappdata(0,'lamp');
-conl = getappdata(0,'conl');
-lam1 = getappdata(0,'lam1');
-lam2 = getappdata(0,'lam2');
-col = getappdata(0,'col');
-row = getappdata(0,'row');
-cnt = getappdata(0,'cnt');
-ccnt = getappdata(0,'ccnt');
-colers = getappdata(0,'colers');
-w = getappdata(0,'w');
-
-if ccnt == 6;
-    ccnt = 1;
-else ccnt = ccnt+1;
-end;
-setappdata(0,'ccnt',ccnt');
-
-[wra, win, deltal, templ, deltar, tempr, nincall, nincalr] = eminp (w, colers, ccnt, cnt, handles, ninl, ninr, mnrowl, mxrowl, mnrowr, mxrowr, divby, omega, lamp, conl, lam1, lam2, col, row);
-
-setappdata(0,'deltal',deltal);
-setappdata(0,'templ',templ);
-setappdata(0,'deltar',deltar);
-setappdata(0,'tempr',tempr);
-setappdata(0,'nincall',nincall);
-setappdata(0,'nincalr',nincalr);
-
-function pushbutton34_Callback(hObject, eventdata, handles)
-tcorr;
-
-function pushbutton35_Callback(hObject, eventdata, handles)
-
-axes(handles.axes1);
-cla reset;
-axes(handles.axes2);
-cla reset;
-axes(handles.axes3);
-cla reset;
-axes(handles.axes4);
-cla reset;
-
-set(handles.text22,'string',0);
-set(handles.text24,'string',0);
-set(handles.text26,'string',0);
-set(handles.text28,'string',0);
-
-status = close(figure(4));
-
-function pushbutton36_Callback(hObject, eventdata, handles)
-save1;
-
-function pushbutton37_Callback(hObject, eventdata, handles)
-save2;
-
-function pushbutton38_Callback(hObject, eventdata, handles)
-
-function pushbutton39_Callback(hObject, eventdata, handles)
-clear;
+function pushbutton39_Callback(~, ~, ~)
+clear all;  %#ok<CLALL>
+clear global;
 close all;
 
-function edit22_Callback(hObject, eventdata, handles)
+% --- IMCREMENT MODE ------------------------------------------------------
 
-function edit22_CreateFcn(hObject, eventdata, handles)
+function radiobutton41_Callback(~, ~, ~)
 
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function radiobutton1_Callback(hObject, eventdata, handles)
-
-function radiobutton2_Callback(hObject, eventdata, handles)
-
-function pushbutton41_Callback(hObject, eventdata, handles)
-
-worp = getappdata(0,'worp');
-
-ufile = get(handles.edit20,'string');
-dpoint = strfind(ufile,'.');
-underscore = strfind(ufile,'_');
-position = size(underscore);
-underscorepos = underscore(position(1,2));
-cfi = str2num(ufile((underscorepos+1):(dpoint-1)));
-cfl = num2str(cfi + 1);
-ufile = strcat(ufile(1:(underscorepos)),cfl,ufile(dpoint:(dpoint+3)));
-set(handles.edit20,'string',ufile)
-
-if worp == 1;
-pushbutton30_Callback(hObject, eventdata, handles);
-end;
-
-if worp == 0;
-pushbutton32_Callback(hObject, eventdata, handles);
-end;
-
-function axes1_ButtonDownFcn(hObject, eventdata, handles)
-
-set(zoom,'ActionPostCallback',@zoomeventl);
-set(zoom,'Enable','on');
-
-function [mnrowl, mxrowl] = zoomeventl(obj,evd)
-newLim = get(evd.Axes,'XLim');
-msgbox(sprintf('The new X-Limits on the left are [%.2f %.2f].',newLim));
-mnrowl = round(newLim(1));
-mxrowl = round(newLim(2));
-
-function axes2_ButtonDownFcn(hObject, eventdata, handles)
-set(zoom,'ActionPostCallback',@bob);
-set(zoom,'Enable','on');
-
-function bob(obj,evd)
-newLim = get(evd.Axes,'XLim');
-msgbox(sprintf('The new X-Limits on the right are [%.2f %.2f].',newLim));
-mnrowr = round(newLim(1));
-mxrowr = round(newLim(2));
-
-function togglebutton2_Callback(hObject, eventdata, handles)
-
-fi = eval(get(handles.edit21,'string'));
-fl = eval(get(handles.edit22,'string'));
-
-[upath]=uigetdir('C:\Documents and Settings\Oliver Lord\Desktop\Data\')
-
-dir_content = dir(upath);
-filenames = {dir_content.name};
-current_files = filenames;
-
-while true
-  pause(2);
-  dir_content = dir(upath);
-  filenames = {dir_content.name};
-  new_files = setdiff(filenames,current_files);
-  
-  if ~isempty(new_files)
-    new_files
-    set_file = char(new_files)
-    set(handles.edit20,'string',set_file);
-    upath = strcat(upath,'\')
-    pause(1);
-    [timevalue, elapsedSecNorm, mintempl, mintempr, stdtempl, stdtempr, avel, aver, errpeakl, errpeakr, cnt, col, lamp, divby, row, templ, jl, etempl, deltal, tempr, jr, etempr, deltar, omega, mnrowl, mxrowl, mnrowr, mxrowr, mnll, mxll, mnlr, mxlr, ninl, ninr, maxtempl, maxtempr, code] = wiencalc4(handles, fi, fl);
-    current_files = filenames;
-  end
-  
-end
+% --- AUTO MODE -----------------------------------------------------------
 
 function radiobutton5_Callback(hObject, eventdata, handles)
 
-togglestate = get(hObject,'Value');
+clear global code timestamp timeSec elapsedSec errpeakl errpeakr...
+    maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left aver...
+    stdtempr min_lambda_right max_lambda_right
+% Clear global variables
 
-scrsz = get(0,'ScreenSize');
-figure(4)
-set(4,'Name', 'Temperature vs. Acquisition', 'Position', [5 552 650 500],'Menubar','none','Toolbar','none');
+auto_flag = 0;
+setappdata(0,'auto_flag',auto_flag);
+% Set auto_flag to 0. Ensures auto_flag is zero if user deselects
+% radiobutton
 
-if togglestate == 1
+buttons = findobj('Style','pushbutton');
+set(buttons, 'enable', 'on')
+% Enables all buttons when auto mode if user deselects radiobutton
 
-    [upath]=uigetdir('C:\Documents and Settings\Oliver Lord\Desktop\Data\');
+if get(handles.radiobutton5,'Value') == 1
+    
+    buttons = findobj('Style','pushbutton');
+    set(buttons, 'enable', 'off')
+    % Disables all buttons when auto mode is switched off
+    
+    upath = strcat(uigetdir('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File'),'/');
     setappdata(0,'upath',upath);
+    dir_content = dir(strcat(upath,'/*.SPE'));
+    initial_list = {dir_content.name};
+    % Collect list of current .TIFF files
 
-    dir_content = dir(upath);
-    filenames = {dir_content.name};
-    current_files = filenames;
-    auto_cnt = 1;
+    while get(handles.radiobutton5,'Value') == 1
 
-    while true
-        togglestate = get(hObject,'Value');
-        if togglestate == 0
+        pause(1);
+        dir_content = dir(strcat(upath,'/*.SPE'));
+        new_list = {dir_content.name};
+        % Collects new list of filenames
+
+        new_filename = setdiff(new_list,initial_list);
+        % Determines list of new files
+
+        if ~isempty(new_filename)
+            
+            auto_flag = auto_flag + 1;
+            setappdata(0,'auto_flag',auto_flag);
+            % Increments auto_flag each time a new file is processed
+            
+            [~, filenumber, ~] = file_enumerator (upath, new_filename{1});
+            % Call enumerator to extract file number from name
+            
+            set(handles.edit20,'string',new_filename{1});
+            set(handles.edit21,'string',filenumber);
+            set(handles.edit22,'string',filenumber);
+            % Update GUI boxes
+
+            pushbutton30_Callback(hObject, eventdata, handles)
+            % Calls main processing subroutine
+
+            initial_list = new_list;
+            % Updates initial list to include new files
+        end
+        % Performs T measurement if new file arrives
+    end
+    % Outer loop waiting for users to switch auto mode off
+end
+% Enters auto-mode if radiobutton is switched on
+
+% --- FILE ENUMERATOR -----------------------------------------------------
+
+function [filelist, filenumber, prefix] = file_enumerator (upath, ufile)
+
+dir_content = dir(strcat(upath,'*.SPE'));
+[~,idx] = sort([dir_content.datenum]);
+dir_content = dir_content(idx);
+% Collect date sorted list of filenames
+
+filelist = zeros(length(idx));
+% Pre-allocate filelist array
+
+for i = 1:length(dir_content)
+
+    digit_str = '';
+    counter_1 = 0;
+    % Set counters
+    
+    for j = 5:length(dir_content(i).name)
+        
+        digit = dir_content(i).name(end+1-j:end+1-j);
+        % Extract element of filename
+        
+        if isstrprop(digit,'digit')
+        % Determine if it is a number
+        
+            digit_str = strcat(digit,digit_str);
+            counter_1 = counter_1 + 1;
+            % If it is, add it to previous digits & increment counter
+            
+        else
+            
+            filelist(i) = str2double(digit_str);
+            % If it isn't a digit, save current run of digits to filelist
+            % converted to numbers
+            
+            if strcmp(dir_content(i).name,ufile) == 1
+            % If Current  filename (i) is the same as the string in the GUI
+            % unknown file box, set filenumber to i
+                
+                filenumber = filelist(i);
+                prefix = dir_content(i).name(1:end-(4+counter_1));
+                % Determine prefix for saving files later
+                
+            end
+           
             break
+            % Exit loop
+        
         end
-        pause(2);
-        dir_content = dir(upath);
-        filenames = {dir_content.name};
-        new_files = setdiff(filenames,current_files);
+        
+    end
+    % Extract number from end of file or arbitrary length with any 
+    % preceding or subsequent non-numeric character
 
-        if ~isempty(new_files)
-            new_files;
-            set_file = strcat('\',(char(new_files)));
-            set(handles.edit20,'string',set_file);
-            %pause(0.1);
-            
-            [automnll, automxll, automnlr, automxlr, timevalue, elapsedSecNorm, mintempl, mintempr, stdtempl, stdtempr, avel, aver, errpeakl, errpeakr, cnt, col, lamp, divby, row, templ, jl, etempl, deltal, tempr, jr, etempr, deltar, omega, mnrowl, mxrowl, mnrowr, mxrowr, mnll, mxll, mnlr, mxlr, ninl, ninr, maxtempl, maxtempr, code] = wiencalc4 (handles, togglestate);
-            
-            start = strfind(set_file, '_');
-            position = size(start);
-            startpos = start(position(1,2));
-            finish = size(set_file);
-            set_file = str2num(set_file((startpos+1):(finish(2)-4)));
-            
-            autocode(auto_cnt) = set_file;
-            autotimevalue(auto_cnt) = timevalue;
-            
-            S = datevec(timevalue);
-            elapsedSec(auto_cnt) = (S(1,6) + (S(1,5)*60) + (S(1,4)*60*60));
-            elapsedSecNorm(auto_cnt) = round(elapsedSec(auto_cnt)-elapsedSec(1));
-            
-            autoelapsedSecNorm(auto_cnt) = elapsedSecNorm(auto_cnt);
-            automaxtempl(auto_cnt) = maxtempl;
-            automaxtempr(auto_cnt) = maxtempr;
-            autoerravel(auto_cnt) = errpeakl;
-            autoerraver(auto_cnt) = errpeakr;
-            automeantempl(auto_cnt) = avel;
-            automeantempr(auto_cnt) = aver;
-            autostdl(auto_cnt) = stdtempl;
-            autostdr(auto_cnt) = stdtempr;
-                       
-            mnll = eval(get(handles.edit7,'string'))
-            mxll = eval(get(handles.edit8,'string'));
-            mnlr = eval(get(handles.edit15,'string'));
-            mxlr = eval(get(handles.edit16,'string'));
-            
-            testmnll(auto_cnt) = mnll
-            testmxll(auto_cnt) = mxll;
-            testmnlr(auto_cnt) = mnlr;
-            testmxlr(auto_cnt) = mxll;
-            
-            autoresult = [autocode', autotimevalue',autoelapsedSecNorm',automaxtempl',autoerravel',automeantempl',autostdl',testmnll',testmxll',automaxtempr', autoerraver',automeantempl',autostdl',testmnlr',testmxlr'];
-
-            assignin('base', 'autoresult', autoresult);
-            assignin('base', 'set_file', set_file);
-            
-            set(0,'CurrentFigure', 4);
-            xlabel('n'), ylabel('Max T (K)'); 
-            set(gca,'NextPlot','add');
-            legend('location', 'NorthWest', 'Left','Right');
-            plot(auto_cnt,automaxtempl(auto_cnt),'--ko','LineWidth',1,...
-                        'MarkerEdgeColor','k',...
-                        'MarkerFaceColor','b',...
-                        'MarkerSize',10);
-            plot(auto_cnt,automaxtempr(auto_cnt),'--ko','LineWidth',1,...
-                        'MarkerEdgeColor','k',...
-                        'MarkerFaceColor','r',...
-                        'MarkerSize',10);
-            
-            % deal with the new files
-            current_files = filenames;
-            
-            auto_cnt = auto_cnt + 1;
-        end
-        % fprintf('no new files\n');
-    end    
-       
-elseif togglestate == 0
-    return        
 end
 
-function radiobutton6_Callback(hObject, eventdata, handles)
+% --- PLOT AXES -----------------------------------------------------------
+
+function plot_axes(xlab, ylab, title_string)
+
+xlabel(xlab, 'FontSize', 14);
+ylabel(ylab, 'FontSize', 14);
+title(title_string, 'FontSize', 16);
+% Sets plot attributes and is called whenever data is plotted
+
+% --- UPDATE ROTATION PARAMETERS ------------------------------------------
+
+function pushbutton43_Callback(~, ~, handles)
+
+upath = getappdata(0,'upath');
+% Get unknown data folder path
+
+rotate(handles,upath);
+% Call rotate function
