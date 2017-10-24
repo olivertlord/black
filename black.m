@@ -44,25 +44,25 @@ set(gcf, 'ToolBar', 'none');
 % Hides menubar and toolbar in figure window
 
 axes(handles.axes1)
-plot_axes('w', 'j', 'Wien Fits')
+plot_axes('w', 'j', 'Wien Fits','Left')
 axes(handles.axes2)
-plot_axes('w', 'j', 'Wien Fits')
+plot_axes('w', 'j', 'Wien Fits','Right')
 axes(handles.axes3)
-plot_axes('pixels', 'Temperature (K)', '')
+plot_axes('pixels', 'Temperature (K)', '', 'Left')
 axes(handles.axes4)
-plot_axes('pixels', 'Temperature (K)', '')
+plot_axes('pixels', 'Temperature (K)', '', 'Right')
 axes(handles.axes5)
-plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History')
+plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History', 'Right')
 axes(handles.axes6)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation')
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Left')
 axes(handles.axes7)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation')
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
 axes(handles.axes8)
-plot_axes('pixels', '', '')
+plot_axes('rows', '', '', 'Left')
 axes(handles.axes9)
-plot_axes('pixels', '', '')
+plot_axes('rows', '', '', 'Right')
 axes(handles.axes10)
-plot_axes('pixels', 'pixels', 'RAW CCD IMAGE')
+plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right')
 % Sets titles and labels of figures by calling function plot_axes
 
 colers=char('r','g','b','c','m','b');
@@ -223,13 +223,10 @@ ROI(handles)
 % --- User sets left hand calibraton file ---------------------------------
 function pushbutton1_Callback(~, ~, handles)
 
-cfilel = uigetfile('./calfiles/*.SPE','Winspec Calibration File');
+cfilel = uigetfile('./calfiles/*.SPE','Winspec Calibration File - LEFT');
 set(handles.edit2,'string',cfilel);
 
-% --- User sets right hand calibraton file --------------------------------
-function pushbutton5_Callback(~, ~, handles)
-
-cfiler = uigetfile('./calfiles/*.SPE','Winspec Calibration File');
+cfiler = uigetfile('./calfiles/*.SPE','Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
 
 % --- User sets unknown file ----------------------------------------------
@@ -471,15 +468,6 @@ for i = 1:length(dir_content)
     % preceding or subsequent non-numeric character
 
 end
-
-% --- PLOT AXES -----------------------------------------------------------
-
-function plot_axes(xlab, ylab, title_string)
-
-xlabel(xlab, 'FontSize', 14);
-ylabel(ylab, 'FontSize', 14);
-title(title_string, 'FontSize', 16);
-% Sets plot attributes and is called whenever data is plotted
 
 % --- UPDATE ROTATION PARAMETERS ------------------------------------------
 

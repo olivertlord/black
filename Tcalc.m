@@ -133,6 +133,7 @@ for m = fi:fl
         
         axes(handles.axes10) %#ok<LAXES>
         imagesc(unkdata_norm(1:1024,3:256)',[0 max(max(unkdata_norm(1:1024,3:256)))]);
+        plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right')
         % Plot Raw Image
         
         ROI(handles)
@@ -215,8 +216,13 @@ for m = fi:fl
             set(handles.edit16,'string',mxlr);
             % Update GUI boxes
             
-            plot(handles.axes6, linspace(570,640,7),avg_err_l,'bo');
-            plot(handles.axes7, linspace(570,640,7),avg_err_r,'bo');
+            axes(handles.axes6)
+            plot(handles.axes6,linspace(570,640,7),avg_err_l,'bo');
+            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
+            
+            axes(handles.axes7)
+            plot(handles.axes7,linspace(570,640,7),avg_err_r,'bo');
+            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
             % Plot minimisation curves
             
         else
@@ -269,9 +275,11 @@ for m = fi:fl
         stdtempl(counter_2)=(nanstd(templ(mnrowl:mxrowl)))/((mxrowl-mnrowl)^(1/2));
         % Calculate standard deviation associated with peak T
         
-        aver(counter_2)=nanmean(tempr(mnrowr:mxrowr));
-        avel(counter_2)=nanmean(templ(mnrowl:mxrowl));
+        aver(counter_2)=nanmean(tempr(mnrowr:mxrowr))
+        avel(counter_2)=nanmean(templ(mnrowl:mxrowl))
         % Calculate average temperature
+        
+        num2str(round(avel(counter_2)))
         
         min_lambda_left(counter_2)=mnll;
         min_lambda_right(counter_2)=mnlr;
