@@ -199,9 +199,10 @@ for m = fi:fl
             
         end
         
-        templ(templ<1)=NaN;
-        tempr(tempr<1)=NaN;
-        % Replace zero temperatures with NaNs so they are not plotted 
+        templ(templ<1 | templ>1e6)=NaN;
+        tempr(tempr<1 | tempr>1e6)=NaN;
+        % Replace zero or unreasonably high temperatures with NaNs so they
+        % are not plotted 
         
         code(counter_2) = m;
         % Set code to current file loop iteration

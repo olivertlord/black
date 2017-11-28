@@ -446,6 +446,8 @@ for i = 1:length(dir_content)
     counter_1 = 0;
     % Set counters
     
+    dir_content(i).name
+    length(dir_content(i).name)
     for j = 5:length(dir_content(i).name)
         
         digit = dir_content(i).name(end+1-j:end+1-j);
