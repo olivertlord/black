@@ -65,8 +65,12 @@ axes(handles.axes10)
 plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right')
 % Sets titles and labels of figures by calling function plot_axes
 
-setappdata(0,'handles',handles);
-% Put handles structure into appdata
+colers=char('r','g','b','c','m','b');
+setappdata(0,'colers',colers);
+% Sets up global plot color list
+
+setappdata(0,'ccnt',1);
+% Initialises global color counter
 
 % Choose default command line output for IRS
 handles.output = hObject;
@@ -243,8 +247,6 @@ set(handles.edit21,'string',filenumber);
 
 data_prep(handles,filenumber,prefix,filenumber,1024,256);
 
-ROI(handles)
-
 % --- FILE RANGE MODE - FIT BUTTON-----------------------------------------
 function pushbutton30_Callback(~, ~, handles)
 
@@ -351,8 +353,8 @@ set(handles.radiobutton5,'enable','on')
 
 if get(handles.radiobutton41,'Value') == 1
     
-    set(handles.radiobutton5,'enable','off')
-    % Disables live mode radiobutton when increment mode is switched on
+    set(handles.radiobutton5,'enable','on')
+    % Enables live mode radiobutton when increment mode is switched off
     
 end
 

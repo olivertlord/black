@@ -52,9 +52,8 @@ ROI_r = imrect(handles.axes10,[lpixr mnrowr hpixr-lpixr mxrowr-mnrowr]);
 addNewPositionCallback(ROI_l,@update_ROI_pos);
 fcn = makeConstrainToRectFcn('imrect',[lpixl hpixl],[128 256]);
 setPositionConstraintFcn(ROI_l,fcn);
-% Calls update_ROI_pos for left but prevents user changing wavelength
+% Calls 
 
 addNewPositionCallback(ROI_r,@update_ROI_pos);
 fcn = makeConstrainToRectFcn('imrect',[lpixr hpixr],[1 127]);
 setPositionConstraintFcn(ROI_r,fcn);
-% Calls update_ROI_pos for right but prevents user changing wavelength

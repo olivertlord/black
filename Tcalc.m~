@@ -180,11 +180,11 @@ for m = fi:fl
             set(handles.edit16,'string',mxlr);
             % Update GUI boxes
             
-            axes(handles.axes6) %#ok<LAXES>
+            axes(handles.axes6)
             plot(handles.axes6,linspace(570,640,7),avg_err_l,'ro');
             plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
             
-            axes(handles.axes7) %#ok<LAXES>
+            axes(handles.axes7)
             plot(handles.axes7,linspace(570,640,7),avg_err_r,'go');
             plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
             % Plot minimisation curves
@@ -198,6 +198,7 @@ for m = fi:fl
             % Calculate temperature Right
             
         end
+
         
         templ(templ<1)=NaN;
         tempr(tempr<1)=NaN;
@@ -249,13 +250,10 @@ for m = fi:fl
         
         if t_diff > 200
             set(handles.text41,'ForegroundColor',[1 0 0])
-            set(handles.text50,'BackgroundColor',[1 0 0])
         elseif t_diff < 100
             set(handles.text41,'ForegroundColor',[0 1 0])
-            set(handles.text50,'BackgroundColor',[0 1 0])
         else
             set(handles.text41,'ForegroundColor',[1 .5 0])
-            set(handles.text50,'BackgroundColor',[1 .5 0])
         end
         % Change color of difference value depending on magnitude
         
@@ -293,7 +291,7 @@ for m = fi:fl
         xlim([min(microns_l) max(microns_l)]);
         % Set x-axes limits on cross-section overlay plots
 
-        hline = get(gca, 'children'); 
+        hline = get(gca, 'children')
         set(hline(1:length(hline)),'Color',[1,.8,.8]);
         % Make previous lines pale
         
@@ -301,7 +299,7 @@ for m = fi:fl
         xlim([min(microns_r) max(microns_r)]);
         % Set x-axes limits on cross-section overlay plots
 
-        hline = get(gca, 'children');
+        hline = get(gca, 'children')
         set(hline(1:length(hline)),'Color',[.8,1,.8]);
         % Make previous lines pale
         

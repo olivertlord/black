@@ -9,9 +9,6 @@ clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
     mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Get GUI box values
 
-ccnt = getappdata(0,'ccnt');
-% Get current global counter value
-
 fid=fopen(strcat('./calfiles/',get(handles.edit2,'string')),'r');
 cal_l=fread(fid,[col row],'real*4','l');
 fclose(fid);
@@ -96,14 +93,6 @@ xlim([lpixr hpixr])
 
 set(handles.radiobutton8,'Value',1);
 % Set "rotate" radiobutton to on
-
-if ccnt == 6
-    ccnt = 1;
-else
-    ccnt = ccnt+1;
-end
-setappdata(0,'ccnt',ccnt);
-% Reset / update color list
 
 pause(5);
 % Pause to allow user to see results
