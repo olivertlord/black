@@ -410,9 +410,8 @@ if get(handles.radiobutton5,'Value') == 1
         dir_content = dir(strcat(upath,'/*.SPE'));
         new_list = {dir_content.name};
         % Collects new list of filenames
-        new_filename = setdiff(new_list,initial_list);
+        new_filename = setdiff(new_list,initial_list)
         % Determines list of new files
-
 
         if ~isempty(new_filename)
 
@@ -420,7 +419,7 @@ if get(handles.radiobutton5,'Value') == 1
             setappdata(0,'auto_flag',auto_flag);
             % Increments auto_flag each time a new file is processed
             
-            set(handles.edit20,'string',new_filename{end});
+            set(handles.edit20,'string',new_filename{1});
             % Update GUI boxes
 
             pushbutton30_Callback(hObject, eventdata, handles)
