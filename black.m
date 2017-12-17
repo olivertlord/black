@@ -44,25 +44,31 @@ set(gcf, 'ToolBar', 'none');
 % Hides menubar and toolbar in figure window
 
 axes(handles.axes1)
-plot_axes('w', 'j', 'Wien Fits','Left')
+plot_axes('w', 'j', 'Wien Fits','Left',1)
 axes(handles.axes2)
-plot_axes('w', 'j', 'Wien Fits','Right')
+plot_axes('w', 'j', 'Wien Fits','Right',1)
 axes(handles.axes3)
-plot_axes('pixels', 'Temperature (K)', '', 'Left')
+plot_axes('pixels', 'Temperature (K)', '', 'Left',0)
 axes(handles.axes4)
-plot_axes('pixels', 'Temperature (K)', '', 'Right')
+plot_axes('pixels', 'Temperature (K)', '', 'Right',0)
 axes(handles.axes5)
-plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History', 'Right')
+plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History', 'Right',0)
 axes(handles.axes6)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
 axes(handles.axes7)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
 axes(handles.axes8)
-plot_axes('rows', '', '', 'Left')
+plot_axes('microns', '', '', 'Right',1)
+uistack(handles.axes8,'bottom');
+
+grid(handles.axes8,'on')
 axes(handles.axes9)
-plot_axes('rows', '', '', 'Right')
+plot_axes('microns', '', '', 'Left',1)
+uistack(handles.axes9,'bottom');
+
+grid(handles.axes9,'on')
 axes(handles.axes10)
-plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right')
+plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right',0)
 % Sets titles and labels of figures by calling function plot_axes
 
 setappdata(0,'handles',handles);

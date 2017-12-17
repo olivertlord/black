@@ -13,12 +13,14 @@ set(handles.edit20,'string',strcat(prefix,num2str(m),'.SPE'));
 unkdata=fread(fid,[col row],'real*4','l');
 % Read in unknown file
 
+fclose(fid);
+
 if get(handles.radiobutton6,'value') == 1
     unkdata = conv2(unkdata,ones(4,1),'same');
 end
 % Smooth data if option selected
 
-unkdata(unkdata> 8.4077e-41)=NaN;
+% unkdata(unkdata> 8.4077e-41)=NaN;
 % Removes saturated pixels
 
 if get(handles.radiobutton1,'value') == 1
@@ -38,7 +40,7 @@ unkdata_norm = unkdata./max(unkdata(:));
 
 axes(handles.axes10)
 imagesc(unkdata_norm(1:1024,3:256)',[0 max(max(unkdata_norm(1:1024,3:256)))]);
-plot_axes('pixels', 'pixels', strcat('RAW CCD IMAGE:',num2str(filenumber)), 'Right')
+plot_axes('pixels', 'pixels', strcat('RAW CCD IMAGE:',num2str(filenumber)), 'Right',1);
 % Plot Raw Image
 
 end

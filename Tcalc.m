@@ -80,7 +80,7 @@ end
 
 if getappdata(0,'history_length') == -1
     
-    setappdata(0,'history_length',1)
+    setappdata(0,'history_length',1);
     % Reset history_length to 1 if it was -1; this allowed global variables
     % to be cleared if user fitted a single file when not in increment mode
     % but not after subsequent increments
@@ -105,7 +105,7 @@ for m = fi:fl
         
         if get(handles.radiobutton8,'Value') == 1
             
-            load('rotfile.mat')
+            load('rotfile.mat');
             
             ninl = imrotate(ninl,-tilt_L,'bicubic');
             ninr = imrotate(ninr,-tilt_R,'bicubic');
@@ -180,13 +180,8 @@ for m = fi:fl
             set(handles.edit16,'string',mxlr);
             % Update GUI boxes
             
-            axes(handles.axes6) %#ok<LAXES>
             plot(handles.axes6,linspace(570,640,7),avg_err_l,'ro');
-            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
-            
-            axes(handles.axes7) %#ok<LAXES>
             plot(handles.axes7,linspace(570,640,7),avg_err_r,'go');
-            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
             % Plot minimisation curves
             
         else
@@ -236,7 +231,7 @@ for m = fi:fl
         avel(counter_2)=nanmean(templ(mnrowl:mxrowl));
         % Calculate average temperature
         
-        num2str(round(avel(counter_2)))
+        num2str(round(avel(counter_2)));
         
         min_lambda_left(counter_2)=mnll;
         min_lambda_right(counter_2)=mnlr;
@@ -266,65 +261,62 @@ for m = fi:fl
         microns_r = linspace(-(xranger/2).*.52,(xranger/2).*.52,xranger-1);
         % Convert pixels to microns
         
-        drawnow;
-        
         plot(handles.axes1, omega(lpixl:hpixl),jl(lpixl:hpixl,mnrowl:mxrowl),'r');
         plot(handles.axes2, omega(lpixr:hpixr),jr(lpixr:hpixr,mnrowr:mxrowr),'g');
         % Plot Wien fits
         
-        axes(handles.axes1) %#ok<LAXES>
-        xlabel('w', 'FontSize', 14);
-        ylabel('j', 'FontSize', 14);
-        title('Wien Fits', 'FontSize', 16);
-        % !!! BUG - have to do this on every iteration or they disappear
-        
-        axes(handles.axes2) %#ok<LAXES>
-        xlabel('w', 'FontSize', 14);
-        ylabel('j', 'FontSize', 14);
-        title('Wien Fits', 'FontSize', 16);
-        % !!! BUG - have to do this on every iteration or they disappear
-        
-        axes(handles.axes8) %#ok<LAXES>
-        xlim([mnrowl mxrowl]);
-        axes(handles.axes9) %#ok<LAXES>
-        xlim([mnrowr mxrowr]);
+        tic
+
+        xlim(handles.axes8,[mnrowl mxrowl]);
+        xlim(handles.axes9,[mnrowr mxrowr]);
         % Set x-axes limits on cross-section plots
         
-        axes(handles.axes3) %#ok<LAXES>
-        xlim([min(microns_l) max(microns_l)]);
+        xlim(handles.axes3,[min(microns_l) max(microns_l)]);
+        xlim(handles.axes4,[min(microns_r) max(microns_r)]);
         % Set x-axes limits on cross-section overlay plots
 
-        hline = get(gca, 'children'); 
-        set(hline(1:length(hline)),'Color',[1,.8,.8]);
+        hline = get(handles.axes3, 'children');
+        if ~isempty(hline)
+            set(hline(1),'Color',[1 .8 .8]);
+        end
         % Make previous lines pale
         
-        axes(handles.axes4) %#ok<LAXES>
-        xlim([min(microns_r) max(microns_r)]);
-        % Set x-axes limits on cross-section overlay plots
-
-        hline = get(gca, 'children');
-        set(hline(1:length(hline)),'Color',[.8,1,.8]);
+%         if length(hline) > 20
+%             delete(hline(length(hline)));
+%         end
+%         % Delete old cross-sections
+                
+        hline = get(handles.axes4, 'children');
+        if ~isempty(hline)
+            set(hline(1),'Color',[.8 1 .8]);
+        end
         % Make previous lines pale
+        
+%         if length(hline) > 20
+%             delete(hline(length(hline)));
+%         end
+%         % Delete old cross-sections
         
         errorbar(handles.axes3, microns_l,templ(mnrowl:mxrowl),deltal(mnrowl:mxrowl),'Color','r');
-        grid(handles.axes3,'on');
-        set(handles.axes3,'NextPlot','add');
         set(handles.text21,'string',strcat('Peak = ',num2str(round(maxtempl(counter_2))),'±',num2str(round(errpeakl(counter_2)))));
         set(handles.text25,'string',strcat('Average = ',num2str(round(avel(counter_2))),'±',num2str(round(stdtempl(counter_2)))));
         % Plot Temperature cross-section left
         
         errorbar(handles.axes4, microns_r,tempr(mnrowr:mxrowr),deltar(mnrowr:mxrowr), 'g');
-        grid(handles.axes4,'on');
-        set(handles.axes4,'NextPlot','add');
         set(handles.text36,'string',strcat('Peak = ',num2str(round(maxtempr(counter_2))),'±',num2str(round(errpeakr(counter_2)))));
         set(handles.text37,'string',strcat('Average = ',num2str(round(aver(counter_2))),'±',num2str(round(stdtempr(counter_2)))));
         % Plot Temperature cross-section right
         
-        axes(handles.axes5) %#ok<LAXES>
-        hold on
-        errorbar(handles.axes5, elapsedSec, maxtempl, errpeakl, 'ro-')
-        errorbar(handles.axes5, elapsedSec, maxtempr, errpeakr, 'go-')
+        errorbar(handles.axes5, elapsedSec, maxtempl, errpeakl, 'ro-');
+        errorbar(handles.axes5, elapsedSec, maxtempr, errpeakr, 'go-');
         % plot Temperature histories
+        
+        pause(0.01);
+        drawnow;
+        
+        toc
+        timer(counter_2) = toc;
+        assignin('base','timer',timer);
         
         pix_dif = (hpixl-lpixl) - (hpixr-lpixr);
         if pix_dif > 0
@@ -347,6 +339,7 @@ for m = fi:fl
         counter_2 = counter_2 + 1;
         % Increment Counter
     end
+
 end
 
 result = [code', timestamp',elapsedSec',maxtempl',errpeakl',avel',stdtempl',min_lambda_left',max_lambda_left',maxtempr',errpeakr',aver',stdtempr',min_lambda_right',max_lambda_right'];
