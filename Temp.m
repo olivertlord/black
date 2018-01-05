@@ -12,6 +12,7 @@ for i=mnrow:mxrow
     % For each CCD row
      
     unir(1:col,i) = nin(1:col,i) .* rot90(lamp(1:col),3); %#ok<AGROW>
+    assignin('base','unir',unir);
     j(1:col,i) = log(unir(1:col,i) .* divby(1:col)); %#ok<AGROW>
     % Calculate unknown radiance for Wien's Law fit
     % Determine the best linear fit for a over selected wavelength range

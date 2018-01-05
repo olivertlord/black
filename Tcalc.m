@@ -1,6 +1,6 @@
 % --- Tcalc function ------------------------------------------------------
 
-function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix)
+function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath)
 
 global code timestamp timeSec elapsedSec errpeakl errpeakr...
     maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left...
@@ -14,12 +14,12 @@ clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
     mnrowl, mxrowl, mnrowr, mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Call ROI function to get values from GUI boxes
 
-fid=fopen(strcat('./calfiles/',get(handles.edit2,'string')),'r');
+fid=fopen(strcat(calpath,get(handles.edit2,'string')),'r');
 cal_l=fread(fid,[col row],'real*4','l');
 fclose(fid);
 % Open thermal calibration file: left
 
-fid = fopen(strcat('calfiles/',get(handles.edit12,'string')),'r');
+fid = fopen(strcat(calpath,get(handles.edit12,'string')),'r');
 cal_r = fread(fid,[col row],'real*4','l');
 fclose(fid);
 % Open thermal calibration file: right
@@ -115,7 +115,7 @@ for m = fi:fl
         
         divby = rot90(w.^5./3.7403E-12,3);
         % Normalized wavelength for Wien's Law fit
-        
+        assignin('base','w',w);
         omega = (14384000.)./w;
         % Normalized intensity for Wien's Law fit
         

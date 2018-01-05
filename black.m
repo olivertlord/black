@@ -225,11 +225,14 @@ ROI(handles)
 % --- User sets left hand calibraton file ---------------------------------
 function pushbutton1_Callback(~, ~, handles)
 
-cfilel = uigetfile('./calfiles/*.SPE','Winspec Calibration File - LEFT');
+[cfilel, calpath] = uigetfile('./calfiles/*.SPE','Winspec Calibration File - LEFT');
 set(handles.edit2,'string',cfilel);
 
-cfiler = uigetfile('./calfiles/*.SPE','Winspec Calibration File - RIGHT');
+[cfiler, calpath] = uigetfile('./calfiles/*.SPE','Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
+
+setappdata(0,'calpath',calpath);
+% Put calibration file path into appdata
 
 % --- User sets unknown file ----------------------------------------------
 function pushbutton29_Callback(~, ~, handles)
@@ -263,7 +266,10 @@ ufile = get(handles.edit20,'string');
 % Get name of unknown file from GUI box
 
 upath = getappdata(0,'upath');
-% Get path from appdata
+% Get unknown file path from appdata
+
+calpath = getappdata(0,'calpath');
+% Get calibration file path from appdata
 
 [filelist, filenumber, prefix] = file_enumerator (upath, ufile);
 % Call enumerator to extract complete file listing unless in auto mode
@@ -338,7 +344,7 @@ else
 end
 % Increments current file by one if user has selected radiobutton
 
-[savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix); %#ok<ASGLU>
+[savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
 % Calls Tcalc
 
 result_file = char(strcat(upath,'/',savename,'_summary.txt'));

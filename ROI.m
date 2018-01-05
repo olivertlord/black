@@ -39,7 +39,7 @@ mnrowr = eval(get(handles.edit17,'string'));
 mxrowr = eval(get(handles.edit18,'string'));
 % Get min and max row numbers from the right
 
-lpixl = round(conl + lam1.*mnll + lam2.*mnll.^2);
+lpixl = round(conl + lam1.*mnll + lam2.*mnll.^2)
 hpixl = round(conl + lam1.*mxll + lam2.*mxll.^2);
 lpixr = round(conl + lam1.*mnlr + lam2.*mnlr.^2);
 hpixr = round(conl + lam1.*mxlr + lam2.*mxlr.^2);
