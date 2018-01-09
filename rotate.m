@@ -79,14 +79,14 @@ save('rotfile.mat','tilt_L','tilt_R')
 
 axes(handles.axes6)
 plot([1:hpixl],peak_l,'bo',[1:1024],polyval(strike_L,1:1:1024),'r-'); %#ok<NBRAK>
-plot_axes('pixels', 'pixels', 'Slope', 'Right')
+plot_axes('pixels', 'pixels', 'Slope', 'Right',1)
 ylim([min(peak_l)-1 max(peak_l)+1]);
 xlim([lpixl hpixl])
 % Plot spline fit resilte left
 
 axes(handles.axes7)
 plot([1:hpixr],peak_r,'bo',[1:1024],polyval(strike_R,1:1:1024),'r-'); %#ok<NBRAK>
-plot_axes('pixels', 'pixels', 'Slope', 'Right')
+plot_axes('pixels', 'pixels', 'Slope', 'Right',1)
 ylim([min(peak_r)-1 max(peak_r)+1]);
 xlim([lpixr hpixr])
 % Plot spline fit resilte right
@@ -97,5 +97,5 @@ set(handles.radiobutton8,'Value',1);
 pause(5);
 % Pause to allow user to see results
 
-Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))))
+Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))),getappdata(0,'calpath'))
 % Run Tcalc

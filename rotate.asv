@@ -1,6 +1,6 @@
 % --- rotate function -----------------------------------------------------
 
-function rotate(handles,upath)
+function rotate(handles,upath,calpath)
 
 clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
 % Clear variables
@@ -8,9 +8,6 @@ clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
 [~, ~, ~, ~, ~, ~, ~, row, col, ~, ~, ~, ~, mnrowl, mxrowl, mnrowr,...
     mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Get GUI box values
-
-ccnt = getappdata(0,'ccnt');
-% Get current global counter value
 
 fid=fopen(strcat('./calfiles/',get(handles.edit2,'string')),'r');
 cal_l=fread(fid,[col row],'real*4','l');
@@ -82,13 +79,14 @@ save('rotfile.mat','tilt_L','tilt_R')
 
 axes(handles.axes6)
 plot([1:hpixl],peak_l,'bo',[1:1024],polyval(strike_L,1:1:1024),'r-'); %#ok<NBRAK>
+plot_axes('pixels', 'pixels', 'Slope', 'Right',1)
 ylim([min(peak_l)-1 max(peak_l)+1]);
 xlim([lpixl hpixl])
-ylabel('pixels', 'FontSize', 12);
 % Plot spline fit resilte left
 
 axes(handles.axes7)
 plot([1:hpixr],peak_r,'bo',[1:1024],polyval(strike_R,1:1:1024),'r-'); %#ok<NBRAK>
+plot_axes('pixels', 'pixels', 'Slope', 'Right',1)
 ylim([min(peak_r)-1 max(peak_r)+1]);
 xlim([lpixr hpixr])
 % Plot spline fit resilte right
@@ -96,16 +94,8 @@ xlim([lpixr hpixr])
 set(handles.radiobutton8,'Value',1);
 % Set "rotate" radiobutton to on
 
-if ccnt == 6
-    ccnt = 1;
-else
-    ccnt = ccnt+1;
-end
-setappdata(0,'ccnt',ccnt);
-% Reset / update color list
-
 pause(5);
 % Pause to allow user to see results
 
-Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))))
+Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))),calpath)
 % Run Tcalc

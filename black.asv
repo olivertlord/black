@@ -44,25 +44,32 @@ set(gcf, 'ToolBar', 'none');
 % Hides menubar and toolbar in figure window
 
 axes(handles.axes1)
-plot_axes('w', 'j', 'Wien Fits','Left')
+plot_axes('w', 'j', 'Wien Fits','Left',1)
 axes(handles.axes2)
-plot_axes('w', 'j', 'Wien Fits','Right')
+plot_axes('w', 'j', 'Wien Fits','Right',1)
 axes(handles.axes3)
-plot_axes('pixels', 'Temperature (K)', '', 'Left')
+plot_axes('microns', 'Temperature (K)', '', 'Left',0)
 axes(handles.axes4)
-plot_axes('pixels', 'Temperature (K)', '', 'Right')
+plot_axes('microns', 'Temperature (K)', '', 'Right',0)
 axes(handles.axes5)
-plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History', 'Right')
+plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History', 'Right',0)
 axes(handles.axes6)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
 axes(handles.axes7)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right')
+plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
+
 axes(handles.axes8)
-plot_axes('rows', '', '', 'Left')
+plot_axes('microns', '', '', 'Right',1)
+uistack(handles.axes8,'bottom');
+
+grid(handles.axes8,'on')
 axes(handles.axes9)
-plot_axes('rows', '', '', 'Right')
+plot_axes('microns', '', '', 'Left',1)
+uistack(handles.axes9,'bottom');
+
+grid(handles.axes9,'on')
 axes(handles.axes10)
-plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right')
+plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right',0)
 % Sets titles and labels of figures by calling function plot_axes
 
 setappdata(0,'handles',handles);
@@ -219,11 +226,14 @@ ROI(handles)
 % --- User sets left hand calibraton file ---------------------------------
 function pushbutton1_Callback(~, ~, handles)
 
-cfilel = uigetfile('./calfiles/*.SPE','Winspec Calibration File - LEFT');
+[cfilel, calpath] = uigetfile('./calfiles/*.SPE','Winspec Calibration File - LEFT');
 set(handles.edit2,'string',cfilel);
 
-cfiler = uigetfile('./calfiles/*.SPE','Winspec Calibration File - RIGHT');
+[cfiler, calpath] = uigetfile('./calfiles/*.SPE','Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
+
+setappdata(0,'calpath',calpath);
+% Put calibration file path into appdata
 
 % --- User sets unknown file ----------------------------------------------
 function pushbutton29_Callback(~, ~, handles)
@@ -257,7 +267,10 @@ ufile = get(handles.edit20,'string');
 % Get name of unknown file from GUI box
 
 upath = getappdata(0,'upath');
-% Get path from appdata
+% Get unknown file path from appdata
+
+calpath = getappdata(0,'calpath');
+% Get calibration file path from appdata
 
 [filelist, filenumber, prefix] = file_enumerator (upath, ufile);
 % Call enumerator to extract complete file listing unless in auto mode
@@ -332,7 +345,7 @@ else
 end
 % Increments current file by one if user has selected radiobutton
 
-[savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix); %#ok<ASGLU>
+[savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
 % Calls Tcalc
 
 result_file = char(strcat(upath,'/',savename,'_summary.txt'));
@@ -410,8 +423,9 @@ if get(handles.radiobutton5,'Value') == 1
         dir_content = dir(strcat(upath,'/*.SPE'));
         new_list = {dir_content.name};
         % Collects new list of filenames
-        new_filename = setdiff(new_list,initial_list)
+        new_filename = setdiff(new_list,initial_list);
         % Determines list of new files
+
 
         if ~isempty(new_filename)
 
@@ -419,7 +433,7 @@ if get(handles.radiobutton5,'Value') == 1
             setappdata(0,'auto_flag',auto_flag);
             % Increments auto_flag each time a new file is processed
             
-            set(handles.edit20,'string',new_filename{1});
+            set(handles.edit20,'string',new_filename{end});
             % Update GUI boxes
 
             pushbutton30_Callback(hObject, eventdata, handles)
