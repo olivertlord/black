@@ -180,8 +180,17 @@ for m = fi:fl
             set(handles.edit16,'string',mxlr);
             % Update GUI boxes
             
-            plot(handles.axes6,linspace(570,640,7),avg_err_l,'ro');
-            plot(handles.axes7,linspace(570,640,7),avg_err_r,'go');
+            axes(handles.axes6);
+            plot(linspace(570,640,7),avg_err_l,'ro');
+            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
+            ylim('auto');
+            xlim('auto');
+            
+            axes(handles.axes7);
+            plot(linspace(570,640,7),avg_err_r,'go');
+            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
+            ylim('auto');
+            xlim('auto');
             % Plot minimisation curves
             
         else
