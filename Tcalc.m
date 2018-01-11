@@ -274,7 +274,7 @@ for m = fi:fl
         plot(handles.axes2, omega(lpixr:hpixr),jr(lpixr:hpixr,mnrowr:mxrowr),'g');
         % Plot Wien fits
         
-%         tic
+        tic
 
         xlim(handles.axes8,[mnrowl mxrowl]);
         xlim(handles.axes9,[mnrowr mxrowr]);
@@ -323,9 +323,9 @@ for m = fi:fl
         pause(0.01);
         drawnow;
         
-%         toc
-%         timer(counter_2) = toc;
-%         assignin('base','timer',timer);
+        toc
+        timer(counter_2) = toc;
+        assignin('base','timer',timer);
         
         pix_dif = (hpixl-lpixl) - (hpixr-lpixr);
         if pix_dif > 0

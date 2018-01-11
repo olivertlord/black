@@ -1,6 +1,6 @@
 % --- rotate function -----------------------------------------------------
 
-function rotate(handles,upath,calpath)
+function rotate(handles,upath)
 
 clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
 % Clear variables
@@ -9,7 +9,7 @@ clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
     mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Get GUI box values
 
-fid=fopen(strcat('./calfiles/',get(handles.edit2,'string')),'r');
+fid=fopen(strcat(getappdata(0,'calpa,get(handles.edit2,'string')),'r');
 cal_l=fread(fid,[col row],'real*4','l');
 fclose(fid);
 % Open thermal calibration file: left
@@ -97,5 +97,5 @@ set(handles.radiobutton8,'Value',1);
 pause(5);
 % Pause to allow user to see results
 
-Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))),calpath)
+Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))),getappdata(0,'calpath'))
 % Run Tcalc

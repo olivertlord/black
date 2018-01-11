@@ -9,12 +9,12 @@ clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
     mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Get GUI box values
 
-fid=fopen(strcat('./calfiles/',get(handles.edit2,'string')),'r');
+fid=fopen(strcat(getappdata(0,'calpath'),get(handles.edit2,'string')),'r');
 cal_l=fread(fid,[col row],'real*4','l');
 fclose(fid);
 % Open thermal calibration file: left
 
-fid = fopen(strcat('calfiles/',get(handles.edit12,'string')),'r');
+fid = fopen(strcat(getappdata(0,'calpath'),get(handles.edit12,'string')),'r');
 cal_r = fread(fid,[col row],'real*4','l');
 fclose(fid);
 % Open thermal calibration file: right
