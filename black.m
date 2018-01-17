@@ -263,7 +263,7 @@ if getappdata(0,'auto_flag') < 2 && get(handles.radiobutton41,'Value') == 0
 end
 % Clear all plots within GUI
 
-ufile = get(handles.edit20,'string');
+ufile = get(handles.edit20,'string')
 % Get name of unknown file from GUI box
 
 upath = getappdata(0,'upath');
@@ -272,6 +272,7 @@ upath = getappdata(0,'upath');
 calpath = getappdata(0,'calpath');
 % Get calibration file path from appdata
 
+dir_content = dir(strcat(upath,'*.SPE'));
 [filelist, filenumber, prefix] = file_enumerator (upath, ufile);
 % Call enumerator to extract complete file listing unless in auto mode
 
@@ -460,3 +461,12 @@ upath = getappdata(0,'upath');
 
 rotate(handles,upath);
 % Call rotate function
+
+
+% --- Executes on button press in radiobutton9.
+function radiobutton9_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton9

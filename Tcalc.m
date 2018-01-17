@@ -1,7 +1,7 @@
 % --- Tcalc function ------------------------------------------------------
 
 function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath)
-
+pause(1)
 global code timestamp timeSec elapsedSec errpeakl errpeakr...
     maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left...
     aver stdtempr min_lambda_right max_lambda_right counter_2
