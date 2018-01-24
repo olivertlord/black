@@ -349,7 +349,7 @@ end
 [savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
 % Calls Tcalc
 
-result_file = char(strcat(upath,'/',savename,'_summary.txt'));
+result_file = char(strcat(upath,'/',savename,'/',savename,'_summary.txt'));
 save(result_file,'result','-ASCII','-double');
 % Saves summary data to text file
 

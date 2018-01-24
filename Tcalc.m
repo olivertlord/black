@@ -37,8 +37,21 @@ end
 lamp = lampcal(w,lam,E);
 % Oopen file w/ W-lamp spectral radiance values
 
-expname = strcat(prefix,'black_',date);
-% Create unique experiment name
+if get(handles.radiobutton9,'Value') == 1
+    
+    expname = strcat(prefix,'black_',date);
+    % Create experiment name conntaining the date
+    
+else
+    
+    unique_name = regexprep(datestr(now),'[\s :]','-');
+    expname = strcat(prefix,'black_',unique_name);
+    % Create experiment name containing the date and time
+
+end
+% Creates a unique folder every day, unless overwrite is deselected in
+% which case the output folder will be unique eveyr time reprocessing is
+% performed.
 
 if get(handles.radiobutton41,'Value') == 0 && getappdata(0,'auto_flag') == 0 && exist(strcat(upath,expname),'dir')
     

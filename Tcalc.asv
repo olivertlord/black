@@ -1,7 +1,7 @@
 % --- Tcalc function ------------------------------------------------------
 
 function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath)
-
+pause(1)
 global code timestamp timeSec elapsedSec errpeakl errpeakr...
     maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left...
     aver stdtempr min_lambda_right max_lambda_right counter_2
@@ -37,8 +37,19 @@ end
 lamp = lampcal(w,lam,E);
 % Oopen file w/ W-lamp spectral radiance values
 
-expname = strcat(prefix,'black_',date);
-% Create unique experiment name
+if get(handles.radiobutton9,'Value') == 1
+    
+    expname = strcat(prefix,'black_',date);
+    % Create experiment name conntaining the date
+    
+else
+    
+    unique_name = regexprep(datestr(now),'[\s :]','-');
+    expname = strcat(prefix,'black_',unique_name);
+    % Create experiment name containing the date and time
+
+end
+% Creates a unique folder every day, unless overwrit
 
 if get(handles.radiobutton41,'Value') == 0 && getappdata(0,'auto_flag') == 0 && exist(strcat(upath,expname),'dir')
     
@@ -180,8 +191,17 @@ for m = fi:fl
             set(handles.edit16,'string',mxlr);
             % Update GUI boxes
             
-            plot(handles.axes6,linspace(570,640,7),avg_err_l,'ro');
-            plot(handles.axes7,linspace(570,640,7),avg_err_r,'go');
+            axes(handles.axes6);
+            plot(linspace(570,640,7),avg_err_l,'ro');
+            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
+            ylim('auto');
+            xlim('auto');
+            
+            axes(handles.axes7);
+            plot(linspace(570,640,7),avg_err_r,'go');
+            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
+            ylim('auto');
+            xlim('auto');
             % Plot minimisation curves
             
         else

@@ -59,15 +59,15 @@ axes(handles.axes7)
 plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
 
 axes(handles.axes8)
-plot_axes('microns', '', '', 'Right',1)
+plot_axes('pixels', '', '', 'Right',1)
 uistack(handles.axes8,'bottom');
-
 grid(handles.axes8,'on')
-axes(handles.axes9)
-plot_axes('microns', '', '', 'Left',1)
-uistack(handles.axes9,'bottom');
 
+axes(handles.axes9)
+plot_axes('pixels', '', '', 'Left',1)
+uistack(handles.axes9,'bottom');
 grid(handles.axes9,'on')
+
 axes(handles.axes10)
 plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right',0)
 % Sets titles and labels of figures by calling function plot_axes
@@ -263,7 +263,7 @@ if getappdata(0,'auto_flag') < 2 && get(handles.radiobutton41,'Value') == 0
 end
 % Clear all plots within GUI
 
-ufile = get(handles.edit20,'string');
+ufile = get(handles.edit20,'string')
 % Get name of unknown file from GUI box
 
 upath = getappdata(0,'upath');
@@ -272,6 +272,7 @@ upath = getappdata(0,'upath');
 calpath = getappdata(0,'calpath');
 % Get calibration file path from appdata
 
+dir_content = dir(strcat(upath,'*.SPE'));
 [filelist, filenumber, prefix] = file_enumerator (upath, ufile);
 % Call enumerator to extract complete file listing unless in auto mode
 
@@ -348,7 +349,7 @@ end
 [savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
 % Calls Tcalc
 
-result_file = char(strcat(upath,'/',savename,'_summary.txt'));
+result_file = char(strcat(upath,'/'expname,savename,'_summary.txt'));
 save(result_file,'result','-ASCII','-double');
 % Saves summary data to text file
 
@@ -460,3 +461,12 @@ upath = getappdata(0,'upath');
 
 rotate(handles,upath);
 % Call rotate function
+
+
+% --- Executes on button press in radiobutton9.
+function radiobutton9_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton9
