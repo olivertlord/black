@@ -247,8 +247,8 @@ setappdata(0,'upath',upath);
 [~, filenumber, prefix] = file_enumerator (upath, ufile);
 % Function enumerator called to determine filenumber from filename
 
-set(handles.edit22,'string',filenumber);
-set(handles.edit21,'string',filenumber);
+set(handles.edit22,'string',num2str(filenumber));
+set(handles.edit21,'string',num2str(filenumber));
 % Set initial and last file number boxes in GUI
 
 data_prep(handles,filenumber,prefix,filenumber,1024,256);
@@ -280,8 +280,8 @@ auto_flag = getappdata(0,'auto_flag');
 % Get auto_flag state
 
 if auto_flag ~= 0
-    set(handles.edit21,'string',filenumber);
-    set(handles.edit22,'string',filenumber);
+    set(handles.edit21,'string',num2str(filenumber));
+    set(handles.edit22,'string',num2str(filenumber));
 end
 % Set GUI boxes to current filenumber if in auto mode
 
@@ -291,12 +291,12 @@ fl = eval(get(handles.edit21,'string'));
     
 if fl<fi
     fl = fi;
-    set(handles.edit21,'string',fl);
+    set(handles.edit21,'string',num2str(fl));
 end
 % Catches fl<fi user input error
 
 if (fl>1) && (filenumber~=fi)
-    ufile = horzcat(prefix,fi,'.SPE');
+    ufile = horzcat(prefix,num2str(fi),'.SPE');
     set(handles.edit20,'string',ufile);
 end
 % Changes filename if it does not match fi
@@ -323,10 +323,10 @@ if get(handles.radiobutton41,'Value') == 1
     end
     % Prevents user incrmenting beyond max file number in directory
     
-    ufile = horzcat(prefix,fi,'.SPE');
+    ufile = horzcat(prefix,num2str(fi),'.SPE');
     set(handles.edit20,'string',ufile);
-    set(handles.edit22,'string',fi);
-    set(handles.edit21,'string',fl);
+    set(handles.edit22,'string',num2str(fi));
+    set(handles.edit21,'string',num2str(fl));
     % Updates GUI boxes to new values
     
 elseif get(handles.radiobutton41,'Value') == 0 && fi == fl
@@ -349,7 +349,7 @@ end
 [savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
 % Calls Tcalc
 
-result_file = char(strcat(upath,'/'expname,savename,'_summary.txt'));
+result_file = char(strcat(upath,'/',savename,'/',savename,'_summary.txt'));
 save(result_file,'result','-ASCII','-double');
 % Saves summary data to text file
 
@@ -413,6 +413,9 @@ if get(handles.radiobutton5,'Value') == 1
     set(handles.radiobutton41,'enable','off')
     % Disables increment radiobutton in auto mode
     
+    set(handles.radiobutton9,'Value') = 1;
+    set(handles.radiobutton9,'enable','off');
+    
     upath = strcat(uigetdir('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File'),'/');
     setappdata(0,'upath',upath);
     dir_content = dir(strcat(upath,'/*.SPE'));
@@ -426,7 +429,6 @@ if get(handles.radiobutton5,'Value') == 1
         % Collects new list of filenames
         new_filename = setdiff(new_list,initial_list);
         % Determines list of new files
-
 
         if ~isempty(new_filename)
 

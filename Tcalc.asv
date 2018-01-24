@@ -1,7 +1,7 @@
 % --- Tcalc function ------------------------------------------------------
 
 function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath)
-pause(1)
+
 global code timestamp timeSec elapsedSec errpeakl errpeakr...
     maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left...
     aver stdtempr min_lambda_right max_lambda_right counter_2
@@ -42,14 +42,16 @@ if get(handles.radiobutton9,'Value') == 1
     expname = strcat(prefix,'black_',date);
     % Create experiment name conntaining the date
     
-else
+elseif get(handles.radiobutton9,'Value') == 1 && 
     
     unique_name = regexprep(datestr(now),'[\s :]','-');
     expname = strcat(prefix,'black_',unique_name);
     % Create experiment name containing the date and time
 
 end
-% Creates a unique folder every day, unless overwrit
+% Creates a unique folder every day, unless overwrite is deselected in
+% which case the output folder will be unique eveyr time reprocessing is
+% performed.
 
 if get(handles.radiobutton41,'Value') == 0 && getappdata(0,'auto_flag') == 0 && exist(strcat(upath,expname),'dir')
     
