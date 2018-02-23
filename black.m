@@ -1,17 +1,66 @@
-% *** BLACK VERSION 6: BY OLIVER T. LORD **********************************
-% *************************************************************************
-
-% Software for the fitting of spectroradiometric data to determine
-% temperature cross-sections in both real-time and post-hoc.
-
-% *************************************************************************
-
-% --- Main GUI script -----------------------------------------------------
-
 function varargout = black(varargin)
-% BLACK M-file for black.fig
+%--------------------------------------------------------------------------
+% black
+%--------------------------------------------------------------------------
+% Version 6.0
+% Written and tested on Matlab R2014a (Windows 7) & R2017a (OS X 10.13)
 
-% --- Initialization code - DO NOT EDIT -----------------------------------
+% Copyright 2018 Oliver Lord, Mike Walter
+% email: oliver.lord@bristol.ac.uk
+ 
+% This file is part of black.
+ 
+% black is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+ 
+% black is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+ 
+% You should have received a copy of the GNU General Public License
+% along with black.  If not, see <http://www.gnu.org/licenses/>.
+%--------------------------------------------------------------------------
+%black M-file for black.fig
+%      black, by itself, creates a new black or raises the existing
+%      singleton*.
+%
+%      H = black returns the handle to a new black or the handle to
+%      the existing singleton*.
+%
+%      black('Property','Value',...) creates a new black using the
+%      given property value pairs. Unrecognized properties are passed via
+%      varargin to black_OpeningFcn.  This calling syntax produces a
+%      warning when there is an existing singleton*.
+%
+%      black('CALLBACK') and black('CALLBACK',hObject,...) call the
+%      local function named CALLBACK in black.M with the given input
+%      arguments.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+
+%      hObject    handle to checkbox1 (see GCBO)
+%      eventdata  reserved - to be defined in a future version of MATLAB
+%      handles    structure with handles and user data (see GUIDATA)
+
+%      handles    structure with handles and user data (see GUIDATA)
+%      varargin   unrecognized PropertyName/PropertyValue pairs from the
+%           command line (see VARARGIN)
+%      varargout  cell array for returning output args (see VARARGOUT);
+
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help black
+
+% Last Modified by GUIDE v2.5 21-Feb-2018 13:54:49
+
+
+%--------------------------------------------------------------------------
+% Begin initialization code - DO NOT EDIT
 
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
