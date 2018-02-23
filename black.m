@@ -226,10 +226,10 @@ ROI(handles)
 % --- User sets left hand calibraton file ---------------------------------
 function pushbutton1_Callback(~, ~, handles)
 
-[cfilel, calpath] = uigetfile('./calfiles/*.SPE','Winspec Calibration File - LEFT');
+[cfilel, calpath] = uigetfile('C:/Program Files/MATLAB/R2014a/black/calfiles/*.SPE','Winspec Calibration File - LEFT');
 set(handles.edit2,'string',cfilel);
 
-[cfiler, calpath] = uigetfile('./calfiles/*.SPE','Winspec Calibration File - RIGHT');
+[cfiler, calpath] = uigetfile('C:/Program Files/MATLAB/R2014a/black/calfiles/*.SPE','Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
 
 setappdata(0,'calpath',calpath);
@@ -247,8 +247,8 @@ setappdata(0,'upath',upath);
 [~, filenumber, prefix] = file_enumerator (upath, ufile);
 % Function enumerator called to determine filenumber from filename
 
-set(handles.edit22,'string',filenumber);
-set(handles.edit21,'string',filenumber);
+set(handles.edit22,'string',num2str(filenumber));
+set(handles.edit21,'string',num2str(filenumber));
 % Set initial and last file number boxes in GUI
 
 data_prep(handles,filenumber,prefix,filenumber,1024,256);
@@ -272,6 +272,9 @@ upath = getappdata(0,'upath');
 calpath = getappdata(0,'calpath');
 % Get calibration file path from appdata
 
+dir_content = dir(strcat(upath,'*.SPE'));
+upath
+ufile
 [filelist, filenumber, prefix] = file_enumerator (upath, ufile);
 % Call enumerator to extract complete file listing unless in auto mode
 
@@ -279,8 +282,8 @@ auto_flag = getappdata(0,'auto_flag');
 % Get auto_flag state
 
 if auto_flag ~= 0
-    set(handles.edit21,'string',filenumber);
-    set(handles.edit22,'string',filenumber);
+    set(handles.edit21,'string',num2str(filenumber));
+    set(handles.edit22,'string',num2str(filenumber));
 end
 % Set GUI boxes to current filenumber if in auto mode
 
@@ -290,12 +293,12 @@ fl = eval(get(handles.edit21,'string'));
     
 if fl<fi
     fl = fi;
-    set(handles.edit21,'string',fl);
+    set(handles.edit21,'string',num2str(fl));
 end
 % Catches fl<fi user input error
 
 if (fl>1) && (filenumber~=fi)
-    ufile = horzcat(prefix,fi,'.SPE');
+    ufile = horzcat(prefix,num2str(fi),'.SPE');
     set(handles.edit20,'string',ufile);
 end
 % Changes filename if it does not match fi
@@ -322,10 +325,10 @@ if get(handles.radiobutton41,'Value') == 1
     end
     % Prevents user incrmenting beyond max file number in directory
     
-    ufile = horzcat(prefix,fi,'.SPE');
+    ufile = horzcat(prefix,num2str(fi),'.SPE');
     set(handles.edit20,'string',ufile);
-    set(handles.edit22,'string',fi);
-    set(handles.edit21,'string',fl);
+    set(handles.edit22,'string',num2str(fi));
+    set(handles.edit21,'string',num2str(fl));
     % Updates GUI boxes to new values
     
 elseif get(handles.radiobutton41,'Value') == 0 && fi == fl
@@ -348,7 +351,7 @@ end
 [savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
 % Calls Tcalc
 
-result_file = char(strcat(upath,'/',savename,'_summary.txt'));
+result_file = char(strcat(upath,'/',savename,'/',savename,'_summary.txt'));
 save(result_file,'result','-ASCII','-double');
 % Saves summary data to text file
 
@@ -398,6 +401,7 @@ setappdata(0,'auto_flag',auto_flag);
 
 buttons = findobj('Style','pushbutton');
 set(buttons, 'enable', 'on')
+set(handles.radiobutton9,'enable','on');
 % Enables all buttons when auto mode is switched off
 
 set(handles.radiobutton41,'enable','on')
@@ -412,6 +416,9 @@ if get(handles.radiobutton5,'Value') == 1
     set(handles.radiobutton41,'enable','off')
     % Disables increment radiobutton in auto mode
     
+    set(handles.radiobutton9,'Value',1);
+    set(handles.radiobutton9,'enable','off');
+    
     upath = strcat(uigetdir('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File'),'/');
     setappdata(0,'upath',upath);
     dir_content = dir(strcat(upath,'/*.SPE'));
@@ -425,7 +432,6 @@ if get(handles.radiobutton5,'Value') == 1
         % Collects new list of filenames
         new_filename = setdiff(new_list,initial_list);
         % Determines list of new files
-
 
         if ~isempty(new_filename)
 
@@ -460,3 +466,12 @@ upath = getappdata(0,'upath');
 
 rotate(handles,upath);
 % Call rotate function
+
+
+% --- Executes on button press in radiobutton9.
+function radiobutton9_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton9
