@@ -1,6 +1,7 @@
 function [M, TF] = padcat(varargin)
+%--------------------------------------------------------------------------
 % PADCAT - concatenate vectors with different lengths by padding with NaN
-%
+%--------------------------------------------------------------------------
 %   M = PADCAT(V1, V2, V3, ..., VN) concatenates the vectors V1 through VN
 %   into one large matrix. All vectors should have the same orientation,
 %   that is, they are all row or column vectors. The vectors do not need to
@@ -62,6 +63,8 @@ function [M, TF] = padcat(varargin)
 % Acknowledgements:
 % Inspired by padadd.m (feb 2000) Fex ID 209 by Dave Johnson
 
+
+%--------------------------------------------------------------------------
 narginchk(1,Inf) ;
 
 % check the inputs
