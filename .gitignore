@@ -1,5 +1,4 @@
-Archive/
-.DS_Store
-*.*~
+example/data/*output*
+*.mat
 *.asv
-
+*.m~
