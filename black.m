@@ -275,10 +275,10 @@ ROI(handles)
 % --- User sets left hand calibraton file ---------------------------------
 function pushbutton1_Callback(~, ~, handles)
 
-[cfilel, calpath] = uigetfile('C:/Program Files/MATLAB/R2014a/black/calfiles/*.SPE','Winspec Calibration File - LEFT');
+[cfilel, calpath] = uigetfile('C:/Users/Spectroradiometry/Documents/MATLAB/black/calibration/*.SPE','Winspec Calibration File - LEFT');
 set(handles.edit2,'string',cfilel);
 
-[cfiler, calpath] = uigetfile('C:/Program Files/MATLAB/R2014a/black/calfiles/*.SPE','Winspec Calibration File - RIGHT');
+[cfiler, calpath] = uigetfile('C:/Users/Spectroradiometry/Documents/MATLAB/black/calibration/*.SPE','Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
 
 setappdata(0,'calpath',calpath);
