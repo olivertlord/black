@@ -57,7 +57,10 @@ cal_r = fread(fid,[col row],'real*4','l');
 fclose(fid);
 % Open thermal calibration file: right
 
-fid = fopen('C:/Program Files/MATLAB/R2014a/black/E256.dat','r','l');
+% Extract path to black folder
+split_path = strsplit(calpath, 'calibration');
+
+fid = fopen(strcat(split_path{end-1},'E256.dat'),'r','l');
 for i = 1:58
     E(i) = fscanf(fid,'%f6.3'); %#ok<AGROW>
 end

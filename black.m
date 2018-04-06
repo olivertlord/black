@@ -275,14 +275,26 @@ ROI(handles)
 % --- User sets left hand calibraton file ---------------------------------
 function pushbutton1_Callback(~, ~, handles)
 
-[cfilel, calpath] = uigetfile('C:/Users/Spectroradiometry/Documents/MATLAB/black/calibration/*.SPE','Winspec Calibration File - LEFT');
+% Extracts path to folder containing black
+split_path = strsplit(mfilename('fullpath'), 'black');
+
+% Creates path to black
+home_path = strcat(split_path{1},'black',split_path{2});
+
+% User points to left calibration file. File browser starts in calibration
+% folder regardless of the path to black
+[cfilel, calpath] = uigetfile(strcat(home_path,'calibration/*.SPE'),...
+    'Winspec Calibration File - LEFT'); %#ok<ASGLU>
 set(handles.edit2,'string',cfilel);
 
-[cfiler, calpath] = uigetfile('C:/Users/Spectroradiometry/Documents/MATLAB/black/calibration/*.SPE','Winspec Calibration File - RIGHT');
+% User points to right calibration file. File browser starts in calibration
+% folder regardless of the path to black
+[cfiler, calpath] = uigetfile(strcat(home_path,'calibration/*.SPE'),...
+    'Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
 
-setappdata(0,'calpath',calpath);
 % Put calibration file path into appdata
+setappdata(0,'calpath',calpath);
 
 % --- User sets unknown file ----------------------------------------------
 function pushbutton29_Callback(~, ~, handles)
