@@ -41,17 +41,8 @@ ROIs = findobj(handles.axes10,'Type', 'hggroup', 'Tag', 'imrect');
 delete(ROIs)
 % Deletes existing ROI rectangle objects
 
-conl = -2000.817;
-lam1 = 3.497;
-lam2 = 0.00016;
-conp = 557.838;
-pix1 = 0.2720;
-pix2 = -3.1000e-06;
+load('hardware_parameters.mat');
 % Wavelength-pixel calibration parameters
-
-row=256;
-col=1024;
-% Sets number of columns and rows of CCD chip
 
 emin = get(handles.radiobutton2,'value');
 % Determines if error minimisation is switched on or off

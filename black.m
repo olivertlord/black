@@ -56,7 +56,7 @@ function varargout = black(varargin)
 
 % Edit the above text to modify the response to help black
 
-% Last Modified by GUIDE v2.5 21-Feb-2018 13:54:49
+% Last Modified by GUIDE v2.5 21-Feb-2019 16:01:06
 
 
 %--------------------------------------------------------------------------
@@ -129,6 +129,11 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
+
+% Load current calibration file names
+load('calibration.mat');
+set(handles.edit2,'string',name_l);
+set(handles.edit12,'string',name_r);
 
 % --- Outputs from this function are returned to the command line. --------
 
@@ -272,8 +277,12 @@ function edit18_Callback(~, ~, handles)
 ROI(handles)
 % Updates ROI boxes by calling function ROI
 
-% --- User sets left hand calibraton file ---------------------------------
-function pushbutton1_Callback(~, ~, handles)
+%--------------------------------------------------------------------------
+% --- Executes when user clisks on the Update Calibration Image button
+function pushbutton1_Callback(~, ~, handles) %#ok<DEFNU>
+
+% Load current calibration data
+calmat = matfile('calibration.mat','Writable',true);
 
 % Extracts path to folder containing black
 split_path = strsplit(mfilename('fullpath'), 'black');
@@ -292,6 +301,22 @@ set(handles.edit2,'string',cfilel);
 [cfiler, calpath] = uigetfile(strcat(home_path,'calibration/*.SPE'),...
     'Winspec Calibration File - RIGHT');
 set(handles.edit12,'string',cfiler);
+
+% Read in left hand calibration data and convert to double
+fid=fopen(strcat(calpath,cfilel),'r');
+cal_data_l=fread(fid,[1024,256],'real*4','l');
+fclose(fid);
+
+% Read in right hand calibration data and convert to double
+fid=fopen(strcat(calpath,cfiler),'r');
+cal_data_r=fread(fid,[1024,256],'real*4','l');
+fclose(fid);
+
+% Save data to .MAT file
+calmat.cal_l = cal_data_l;
+calmat.cal_r = cal_data_r;
+calmat.name_l = cfilel;
+calmat.name_r = cfiler;
 
 % Put calibration file path into appdata
 setappdata(0,'calpath',calpath);
@@ -334,8 +359,7 @@ calpath = getappdata(0,'calpath');
 % Get calibration file path from appdata
 
 dir_content = dir(strcat(upath,'*.SPE'));
-upath
-ufile
+
 [filelist, filenumber, prefix] = file_enumerator (upath, ufile);
 % Call enumerator to extract complete file listing unless in auto mode
 
@@ -431,6 +455,11 @@ clear all;   %#ok<CLFUN>
 clear global;
 fclose('all');
 close all;
+
+% --- UPDATE HARDWARE PARAMETERS BUTTON -----------------------------------
+
+function pushbutton44_Callback(hObject, eventdata, handles)
+hardware_parameters
 
 % --- IMCREMENT MODE ------------------------------------------------------
 
@@ -531,8 +560,3 @@ rotate(handles,upath);
 
 % --- Executes on button press in radiobutton9.
 function radiobutton9_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton9 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of radiobutton9

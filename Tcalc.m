@@ -47,20 +47,10 @@ clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
     mnrowl, mxrowl, mnrowr, mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Call ROI function to get values from GUI boxes
 
-fid=fopen(strcat(calpath,get(handles.edit2,'string')),'r');
-cal_l=fread(fid,[col row],'real*4','l');
-fclose(fid);
-% Open thermal calibration file: left
+% Load calibration data
+load('calibration.mat');
 
-fid = fopen(strcat(calpath,get(handles.edit12,'string')),'r');
-cal_r = fread(fid,[col row],'real*4','l');
-fclose(fid);
-% Open thermal calibration file: right
-
-% Extract path to black folder
-split_path = strsplit(calpath, 'calibration');
-
-fid = fopen(strcat(split_path{end-1},'E256.dat'),'r','l');
+fid = fopen(strcat(pwd,'/E256.dat'),'r','l');
 for i = 1:58
     E(i) = fscanf(fid,'%f6.3'); %#ok<AGROW>
 end
@@ -100,6 +90,9 @@ elseif getappdata(0,'auto_flag') == 1 || ~exist(strcat(upath,expname),'dir')
     mkdir(strcat(upath,expname));
     % Create directory if in auto mode and if it doesnt yet exist
 end
+
+copyfile(strcat(pwd,'/calibration.mat'),strcat(upath,expname,'/calibration.mat'));
+copyfile(strcat(pwd,'/hardware_parameters.mat'),strcat(upath,expname,'/hardware_parameters.mat'));
 
 if getappdata(0,'auto_flag') == 0 && getappdata(0,'history_length') < 1
     
