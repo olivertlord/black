@@ -40,13 +40,20 @@ handles = getappdata(0,'handles');
 % Get handles structure from appdata
 
 if ROI_pos(2) > 127
-    set(handles.edit9,'string',num2str(round(ROI_pos(2))))
-    set(handles.edit10,'string',num2str(round(ROI_pos(2))+round(ROI_pos(4))))
+    ROI_pos
+    set(handles.edit_ROI_min_left,'string',num2str(round(ROI_pos(2))))
+    set(handles.edit_ROI_max_left,'string',num2str(round(ROI_pos(2))+round(ROI_pos(4))))
+    
+    set(handles.edit_wavelength_min_left,'string',num2str(round(ROI_pos(1))))
+    set(handles.edit_wavelength_max_left,'string',num2str(round(ROI_pos(1))+round(ROI_pos(3))))
 else
-    set(handles.edit17,'string',num2str(round(ROI_pos(2))))
-    set(handles.edit18,'string',num2str(round(ROI_pos(2))+round(ROI_pos(4))))
+    b=1
+    set(handles.edit_ROI_min_right,'string',num2str(round(ROI_pos(2))))
+    set(handles.edit_ROI_max_right,'string',num2str(round(ROI_pos(2))+round(ROI_pos(4))))
+    
+    set(handles.edit_wavelength_min_right,'string',num2str(round(ROI_pos(1))))
+    set(handles.edit_wavelength_max_right,'string',num2str(round(ROI_pos(1))+round(ROI_pos(3))))
 end
 % Determines whether function has been called by the left or right ROI box
 % based on the x-pixel position (right nor left cannot extend beyond
 % 256/2). Updates values in text boxes based on ROI position.
-

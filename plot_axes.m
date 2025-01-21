@@ -1,4 +1,4 @@
-function plot_axes(xlab, ylab, title_string, yloc, replace)
+function plot_axes(handles,plot_name, xlab, ylab, title_string, yloc, replace, auto, ylim1, ylim2, xlim1, xlim2)
 %--------------------------------------------------------------------------
 % PLOT_AXES
 %--------------------------------------------------------------------------
@@ -35,9 +35,17 @@ function plot_axes(xlab, ylab, title_string, yloc, replace)
 
 
 %--------------------------------------------------------------------------
+axes(handles.(plot_name))
 xlabel(xlab, 'FontSize', 12);
 ylabel(ylab, 'FontSize', 12);
-title(title_string, 'FontSize', 14);
+
+if strfind(title_string,'Wien') == 1
+    ax=gca;
+    yticklabels = get(ax, 'YTickLabel');
+    yticklabels(1) = ' ';
+    set(ax, 'YTickLabel',yticklabels);
+end
+    
 set(gca,'YAxisLocation',yloc)
 if replace == 1
     set(gca,'NextPlot','replacechildren') ;
@@ -45,4 +53,16 @@ else
     set(gca,'NextPlot','Add') ;
 end
 
-% Sets plot attributes and is called whenever data is plotted
+% Sets auto limits if required
+if auto == 1
+    ylim('auto')
+    xlim('auto')
+elseif auto == 0
+    ylim([ylim1 ylim2]);
+    xlim([xlim1 xlim2]);
+end
+
+if strcmp(title_string,'Cross-sections') == 0 && strcmp(title_string,'Wien fits') == 0
+    title(title_string, 'FontSize', 14);
+end
+%--------------------------------------------------------------------------

@@ -23,11 +23,7 @@ function [lamp] = lampcal(w,lam,E)
 % You should have received a copy of the GNU General Public License
 % along with black.  If not, see <http://www.gnu.org/licenses/>.
 %--------------------------------------------------------------------------
-%   DATA_PREP Applies user optional data cleaning procedures to the data
-%   before fitting. This function opens the raw data file, reads in the
-%   data, smooths it, removes saturated pixels, applies W emissivity values
-%   and normalises the image for plotting and then plots in axes10. It does
-%   not calibrate the data.
+%   LAMPCAL
 
 %   INPUTS:
 

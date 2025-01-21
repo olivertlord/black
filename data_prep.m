@@ -1,4 +1,4 @@
-function [unkdata] = data_prep(handles,filenumber,prefix,m,col,row)
+function [unkdata,skip] = data_prep(handles,upath,filename,i)
 %--------------------------------------------------------------------------
 % DATA_PREP
 %--------------------------------------------------------------------------
@@ -23,35 +23,74 @@ function [unkdata] = data_prep(handles,filenumber,prefix,m,col,row)
 % You should have received a copy of the GNU General Public License
 % along with black.  If not, see <http://www.gnu.org/licenses/>.
 %--------------------------------------------------------------------------
-%   DATA_PREP Applies user optional data cleaning procedures to the data
-%   before fitting. This function opens the raw data file, reads in the
-%   data, smooths it, removes saturated pixels, applies W emissivity values
-%   and normalises the image for plotting and then plots in axes10. It does
-%   not calibrate the data.
+%   DATA_PREP 
 
 %   INPUTS:
 
 %   OUTPUTS:
 
 %--------------------------------------------------------------------------
-fid=fopen(strcat(getappdata(0,'upath'),strcat(prefix,num2str(m),'.SPE')),'r');
-set(handles.edit20,'string',strcat(prefix,num2str(m),'.SPE'));
-% Open file and set GUI box to file name
 
-unkdata=fread(fid,[col row],'real*4','l');
-% Read in unknown file
+% Read in hardware parameters
+hp = matfile('hardware_parameters.mat','Writable',true);
 
-fclose(fid);
+% Set GUI box to file name
+set(handles.edit_filename,'string',filename);
 
-if get(handles.radiobutton6,'value') == 1
-    unkdata = conv2(unkdata,ones(4,1),'same');
+% Read .sif files from iDus detector using Andor sifreader
+if isempty(strfind(filename, 'sif')) == false
+    
+    [unkdata,wavelengths] = sifreader(strcat(upath,filename));
+    
+    % Remove saturated pixels
+    unkdata(unkdata> 64000) = NaN;
+    
+% Read .spe files from PIXIS detector
+elseif isempty(strfind(filename, 'spe')) == false
+    
+    fid=fopen(strcat(upath,filename),'r');
+    unkdata=fread(fid,[hp.col,hp.row],'real*4','l');
+    fclose(fid);
+    
+    % Remove the first a last columns due to artefacts
+    unkdata(1:5,:)=NaN;
+    unkdata(hp.col-5:hp.col,:)=NaN;
+    
+    % Remove saturated pixels
+    unkdata(unkdata> 8.4077e-41) = NaN;
 end
-% Smooth data if option selected
 
-% unkdata(unkdata> 8.4077e-41)=NaN;
-% Removes saturated pixels
+% WPRKAROUND FOR SVEN FRIEDEMANN'S GROUP
+% If raw data is binned, copy single row to all rows 
+if length(unkdata(1,:)) < 256
+    if isempty(strfind(filename, 'sif')) == false
+        binned = unkdata(:,1);
+    elseif isempty(strfind(filename, 'spe')) == false
+        binned = unkdata(:,2);
+    end
+    unkdata = padarray(binned,[0 255],'replicate','post');
+end
 
-if get(handles.radiobutton1,'value') == 1
+% If the subtract radiobutton is switched on
+if get(handles.radiobutton_subtract_background,'value') == 1
+    
+    % Get backgorund data from AppData
+    backdata = getappdata(0,'backdata');
+    
+    % Remove saturated pixels
+    backdata(backdata> 64000) = NaN;
+    
+    % If raw data is binned, copy single row to all rows
+    if length(backdata(1,:)) < 256
+        binned = backdata(:,1);
+        backdata = padarray(binned,[0 255],'replicate','post');
+    end
+        unkdata = unkdata-backdata;
+        
+end    
+
+% Use W emissivity if radiobutton selected
+if get(handles.radiobutton_W_emissivity,'value') == 1
     for i=1:col
         E(i) = 0.53003 - 0.000136*w(i); %#ok<AGROW>
     end
@@ -61,15 +100,31 @@ if get(handles.radiobutton1,'value') == 1
         end
     end
 end
-% Use W emissivity data if selected by user
 
-unkdata_norm = unkdata./max(unkdata(:));
-% Normalises unkdata such that max = 1 for plotting
-
-axes(handles.axes10)
-imagesc(unkdata_norm(1:1024,3:256)',[0 max(max(unkdata_norm(1:1024,3:256)))]);
-plot_axes('pixels', 'pixels', strcat('RAW CCD IMAGE:',num2str(filenumber)), 'Right',1);
-% Plot Raw Image
-
+% Skips data if blank after desaturation
+if isnan(max(unkdata(:)))
+    skip = 1;
+else
+    skip = 0;
 end
 
+% Smooth data
+smooth = ceil(get(handles.slider_smooth,'Value'));
+unkdata = conv2(unkdata,ones(smooth,1),'same');
+set(handles.text_smooth,'String',num2str(smooth));
+
+% Sum multiple data files
+if get(handles.radiobutton_sum,'value') == 1 
+    sum_store = getappdata(0,'sum_store');
+    sum_store(:,:,i) = unkdata;
+    setappdata(0,'sum_store',sum_store);
+    unkdata = sum(sum_store,3);   
+end
+
+% Plot Raw Image
+axes(handles.plot_raw)
+imagesc(wavelengths,1:256,unkdata(1:1024,1:256)',[0 max(max(unkdata))]);
+plot_axes(handles,'plot_raw','wavelength (nm)','pixels',...
+    strcat('RAW CCD IMAGE:',filename), 'Right',1,0,1,length(unkdata(1,:)),wavelengths(:,1),wavelengths(:,end));
+
+end

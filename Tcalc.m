@@ -1,4 +1,4 @@
-function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath)
+function [] = Tcalc(handles, file_path, output_folder, unkdata, caldata_l, caldata_r, hp, wavelengths, i, elapsedSec, filename, timestamp)
 %--------------------------------------------------------------------------
 % TCALC
 %--------------------------------------------------------------------------
@@ -23,376 +23,354 @@ function [expname, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, cal
 % You should have received a copy of the GNU General Public License
 % along with black.  If not, see <http://www.gnu.org/licenses/>.
 %--------------------------------------------------------------------------
-%   DATA_PREP Applies user optional data cleaning procedures to the data
-%   before fitting. This function opens the raw data file, reads in the
-%   data, smooths it, removes saturated pixels, applies W emissivity values
-%   and normalises the image for plotting and then plots in axes10. It does
-%   not calibrate the data.
+%   TCALC
 
 %   INPUTS:
 
 %   OUTPUTS:
 
-
 %--------------------------------------------------------------------------
-global code timestamp timeSec elapsedSec errpeakl errpeakr...
-    maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left...
-    aver stdtempr min_lambda_right max_lambda_right counter_2
-% Set global variables
 
-clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
-% Clear previous variables
-
-[emin, conl, lam1, lam2, conp, pix1, pix2, row, col, mnll, mxll, mnlr, mxlr,...
-    mnrowl, mxrowl, mnrowr, mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
 % Call ROI function to get values from GUI boxes
+[mnll, mxll, mnlr, mxlr, mnrowl, mxrowl, mnrowr, mxrowr] = ROI(handles);
 
-% Load calibration data
-load('calibration.mat');
+% If Auto rotate radiobutton selected, rotate image by angles saved in
+% rotfile.mat
+if get(handles.radiobutton_auto_rotate,'Value') == 1
+            
+    rots = load('rotfile.mat');
+    unkl = imrotate(unkdata,-rots.tilt_L,'bicubic');
+    unkr = imrotate(unkdata,-rots.tilt_R,'bicubic');
 
-fid = fopen(strcat(pwd,'/E256.dat'),'r','l');
-for i = 1:58
-    E(i) = fscanf(fid,'%f6.3'); %#ok<AGROW>
-end
-for i = 1:58
-    lam(i)=460+i*10; %#ok<AGROW>
-end
-for i = 1:col
-    w(i) = conp + pix1*i - pix2*i^2; %#ok<AGROW>
-end
-lamp = lampcal(w,lam,E);
-% Oopen file w/ W-lamp spectral radiance values
-
-if get(handles.radiobutton9,'Value') == 1
-    
-    expname = strcat(prefix,'black_',date);
-    % Create experiment name conntaining the date
-    
 else
     
-    unique_name = regexprep(datestr(now),'[\s :]','-');
-    expname = strcat(prefix,'black_',unique_name);
-    % Create experiment name containing the date and time
-
-end
-% Creates a unique folder every day, unless overwrite is deselected in
-% which case the output folder will be unique eveyr time reprocessing is
-% performed.
-
-if get(handles.radiobutton41,'Value') == 0 && getappdata(0,'auto_flag') == 0 && exist(strcat(upath,expname),'dir')
-    
-    rmdir(strcat(upath,expname),'s');
-    mkdir(strcat(upath,expname));
-    % Overwrite directory if not in auto or increment modes
-    
-elseif getappdata(0,'auto_flag') == 1 || ~exist(strcat(upath,expname),'dir')
-    
-    mkdir(strcat(upath,expname));
-    % Create directory if in auto mode and if it doesnt yet exist
-end
-
-copyfile(strcat(pwd,'/calibration.mat'),strcat(upath,expname,'/calibration.mat'));
-copyfile(strcat(pwd,'/hardware_parameters.mat'),strcat(upath,expname,'/hardware_parameters.mat'));
-
-if getappdata(0,'auto_flag') == 0 && getappdata(0,'history_length') < 1
-    
-    [code, timestamp, timeSec, elapsedSec, errpeakl, errpeakr,...
-        maxtempl, maxtempr, avel, stdtempl, min_lambda_left,...
-        max_lambda_left, aver, stdtempr, min_lambda_right,...
-        max_lambda_right] = deal([]);
-    % Clear global variables if not in auto_mode or increment mode 
-end
-
-if getappdata(0,'auto_flag') > 0
-    
-    counter_2 = getappdata(0,'auto_flag');
-    % Increment counter when in auto_mode
-    
-elseif getappdata(0,'history_length') > 0
-    
-    counter_2 = getappdata(0,'history_length') + 1;
-    setappdata(0,'history_length',counter_2);
-    % Increment counter if in increment mode
-    
-else
-    counter_2 = 1;
-    % Restart counter if not in auto or increment mode
+    [unkl,unkr]=deal(unkdata);
     
 end
 
-if getappdata(0,'history_length') == -1
+% Constant c1 = 2hc^2*pi*1e4 in W cm2 where h is Planck's constant in J s, c
+% is the speed of light in m s-1
+c1 = 3.74177e-12;
+
+% Constant c2 = hc/k*1e9 nm K where h is Planck's constant in J s, c is the
+% speed of light in m s-1 and k is Boltzmann's constant in J K-1.
+c2 = 14387773.54;
+
+% Determines normalised wavelengths for fitting and plotting
+nw = c2./wavelengths';
+
+% Perform error minmisation if radiobutton selected
+if get(handles.popupmenu_error_min_type,'Value') > 1 && get(handles.popupmenu_error_min_type,'Value') < 4
     
-    setappdata(0,'history_length',1);
-    % Reset history_length to 1 if it was -1; this allowed global variables
-    % to be cleared if user fitted a single file when not in increment mode
-    % but not after subsequent increments
+    maxpix = 1024;
+    lsteps = 45;
+    wsteps = lsteps;
+    min_step = 20;
+    min_width = 124;
     
-end
+    if get(handles.popupmenu_error_min_type,'Value') == 2
+        wsteps = 0;
+        min_width=700;
+    end
+    
+    spix = repmat((0:min_step:maxpix-min_width)',[1 wsteps+1]);
+    epix = spix+repmat((min_width:(maxpix-min_width)/wsteps:maxpix),[wsteps+1 1]);
+    
+    spix(spix==0)=1;
+    epix(epix>1024)=NaN;
+    spix(isnan(epix))=NaN;
+    
+    inner_length = size(epix);
+    
+    for i = 1:length(spix)
+        
+        for j = 1:inner_length(2)
+            if ~isnan(spix(i,j)) && ~isnan(epix(i,j))
+                
+                % Calculate min and max wavelengths from start and end
+                % pixel numbers
+                mnl=wavelengths(spix(i,j));
+                mxl=wavelengths(epix(i,j));
+                
+                % Calculate temperature Left and Right
+                [Tl,J,El,Eel,el,rl,SSDl] = Temp(unkl,caldata_l,hp.sr,wavelengths,mnl,mxl,mxrowl,mnrowl,handles,nw,c1);
+                [Tr,J,Er,Eer,er,rr,SSDr] = Temp(unkr,caldata_r,hp.sr,wavelengths,mnl,mxl,mxrowr,mnrowr,handles,nw,c1);
+                
+                % Determine average T left and right
+                aTl(i,j) = nanmean(Tl); %#ok<AGROW>
+                aTr(i,j) = nanmean(Tr); %#ok<AGROW>
+              
+                % Determine average error left and right
+                ael(i,j) = nanmean(el); %#ok<AGROW>
+                aer(i,j) = nanmean(er); %#ok<AGROW>
 
-for m = fi:fl
-% for every file number in range
-
-    if ismember(m,filelist)
-    % if file number is in the file lsit
-
-        [unkdata] = data_prep(handles,m,prefix,m,col,row);
-        % Call data_prep function
-        
-        ninl = unkdata./cal_l;
-        ninr = unkdata./cal_r;
-        % Normalize unknown data to calibration data
-        
-        ROI(handles)
-        % Call ROI function to draw ROI rectangles on raw image
-        
-        if get(handles.radiobutton8,'Value') == 1
-            
-            load('rotfile.mat');
-            
-            ninl = imrotate(ninl,-tilt_L,'bicubic');
-            ninr = imrotate(ninr,-tilt_R,'bicubic');
-            
-        end
-        % Load rotation angles if option selected; rotate images
-        
-        divby = rot90(w.^5./3.7403E-12,3);
-        % Normalized wavelength for Wien's Law fit
-        assignin('base','w',w);
-        omega = (14384000.)./w;
-        % Normalized intensity for Wien's Law fit
-        
-        if emin == 1
-            
-            min_lambda = 570;
-            counter_1 = 1;
-            [min_err_l, min_err_r] = deal(1000);
-            % Set counter, min lambda and set error high
-            
-            while (min_lambda<640)
-                
-                [templ_emin,jl_emin,etempl_emin,deltal_emin] = Temp(ninl,divby,omega,w,lamp,conl,lam1,lam2,min_lambda+200,min_lambda,mxrowl,mnrowl,col,unkdata,handles);
-                % Calculate temperature Left
-                
-                [tempr_emin,jr_emin,etempr_emin,deltar_emin] = Temp(ninr,divby,omega,w,lamp,conl,lam1,lam2,min_lambda+200,min_lambda,mxrowr,mnrowr,col,unkdata,handles);
-                % Calculate temperature right
-                
-                avg_err_l(counter_1) = nanmean(deltal_emin); %#ok<AGROW>
-                % Determine average error left
-                
-                avg_err_r(counter_1) = nanmean(deltar_emin); %#ok<AGROW>
-                % Determine average error right
-                
-                if avg_err_l(counter_1) < min_err_l
-                % If left error is lower  than previous minumum
-                
-                    min_err_l = avg_err_l(counter_1);
-                    % Set new minimum error
-                    
-                    [templ,jl,~,deltal] = deal(templ_emin,jl_emin,etempl_emin,deltal_emin);
-                    % Set fit parameters to current best
-                    
-                    mnll = min_lambda;
-                    mxll = mnll + 200;
-                    % Set min and max lambda to current best
-                    
-                end
-                
-                if avg_err_r(counter_1) < min_err_r
-                % If left error is lower  than previous minumum
-                    
-                    min_err_r = avg_err_r(counter_1);
-                    % Set new minimum error
-                    
-                    [tempr,jr,~,deltar] = deal(tempr_emin,jr_emin,etempr_emin,deltar_emin);
-                    % Set fit parameters to current best
-                    
-                    mnlr = min_lambda;
-                    mxlr = mnlr + 200;
-                end
-                
-                min_lambda = min_lambda + 10;
-                counter_1 = counter_1 + 1;
-                % Set min and max lambda to current best
-                
+                % Determine SSD left and right
+                aSSDl(i,j) = nanmean(SSDl);
+                aSSDr(i,j) = nanmean(SSDr);
             end
-            
-            set(handles.edit7,'string',mnll);
-            set(handles.edit8,'string',mxll);
-            set(handles.edit15,'string',mnlr);
-            set(handles.edit16,'string',mxlr);
-            % Update GUI boxes
-            
-            axes(handles.axes6);
-            plot(linspace(570,640,7),avg_err_l,'ro');
-            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
-            ylim('auto');
-            xlim('auto');
-            
-            axes(handles.axes7);
-            plot(linspace(570,640,7),avg_err_r,'go');
-            plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
-            ylim('auto');
-            xlim('auto');
-            % Plot minimisation curves
-            
-        else
-            
-            [templ,jl,~,deltal] = Temp(ninl,divby,omega,w,lamp,conl,lam1,lam2,mxll,mnll,mxrowl,mnrowl,col,unkdata,handles);
-            % Calculate temperature Left
-
-            [tempr,jr,~,deltar] = Temp(ninr,divby,omega,w,lamp,conl,lam1,lam2,mxlr,mnlr,mxrowr,mnrowr,col,unkdata,handles);
-            % Calculate temperature Right
-            
         end
-        
-        templ(templ<1 | templ>1e6)=NaN;
-        tempr(tempr<1 | tempr>1e6)=NaN;
-        % Replace zero or unreasonably high temperatures with NaNs so they
-        % are not plotted 
-        
-        code(counter_2) = m;
-        % Set code to current file loop iteration
-        
-        FileInfo = dir(strcat(upath,prefix,num2str(m),'.SPE'));
-        timestamp(counter_2) = datenum(FileInfo.date);
-        % Get timestamp
-        
-        timevector = datevec(timestamp(counter_2));
-        % Vectorise timestamp
-        
-        timeSec(counter_2) = (timevector(1,6) + (timevector(1,5)*60) + (timevector(1,4)*60*60));
-        % Convert timevector to seconds
-        
-        elapsedSec(counter_2) = round(timeSec(counter_2)-timeSec(1));
-        % Determine seconds elapsed since start of experiment
-        
-        [maxtempr(counter_2),y] = max(tempr(mnrowr:mxrowr));
-        errpeakr(counter_2)=deltar(y+mnrowr-1);
-        % Find peak temperature value and position and associated error
-        
-        [maxtempl(counter_2),y] = max(templ(mnrowl:mxrowl));
-        errpeakl(counter_2)=deltal(y+mnrowl-1);
-        % Find peak temperature value and position and associated error
-        
-        stdtempr(counter_2)=(nanstd(tempr(mnrowr:mxrowr)))/((mxrowr-mnrowr)^(1/2));
-        stdtempl(counter_2)=(nanstd(templ(mnrowl:mxrowl)))/((mxrowl-mnrowl)^(1/2));
-        % Calculate standard deviation associated with peak T
-        
-        aver(counter_2)=nanmean(tempr(mnrowr:mxrowr));
-        avel(counter_2)=nanmean(templ(mnrowl:mxrowl));
-        % Calculate average temperature
-        
-        num2str(round(avel(counter_2)));
-        
-        min_lambda_left(counter_2)=mnll;
-        min_lambda_right(counter_2)=mnlr;
-        max_lambda_left(counter_2)=mxll;
-        max_lambda_right(counter_2)=mxlr;
-        % Store minimum and maximum lambda values
+    end
+    
+    % Remove negative errors
+    ael(ael<=0)=NaN;
+    aer(aer<=0)=NaN;
+    
+    % Remove zeros from SSD
+    aSSDl(aSSDl<=0)=NaN;
+    aSSDr(aSSDr<=0)=NaN;
+
+    % Definine minimisation indices
+    [~,idxl] = min(ael(:));
+    [~,idxr] = min(aer(:));
+
+    % Calculate start wavelengths from start pixels
+    sw = wavelengths(spix(:,1));
  
-        t_diff = round(abs(maxtempl(counter_2)-maxtempr(counter_2)));
-        set(handles.text41,'String',num2str(t_diff));
-        % Determine and display difference between peaks
-        
-        if t_diff > 200
-            set(handles.text41,'ForegroundColor',[1 0 0])
-            set(handles.text50,'BackgroundColor',[1 0 0])
-        elseif t_diff < 100
-            set(handles.text41,'ForegroundColor',[0 1 0])
-            set(handles.text50,'BackgroundColor',[0 1 0])
-        else
-            set(handles.text41,'ForegroundColor',[1 .5 0])
-            set(handles.text50,'BackgroundColor',[1 .5 0])
-        end
-        % Change color of difference value depending on magnitude
-        
-        xrangel=mxrowl-mnrowl+2;
-        microns_l = linspace(-(xrangel/2).*.52,(xrangel/2).*.52,xrangel-1);        
-        xranger=mxrowr-mnrowr+2;
-        microns_r = linspace(-(xranger/2).*.52,(xranger/2).*.52,xranger-1);
-        % Convert pixels to microns
-        
-        plot(handles.axes1, omega(lpixl:hpixl),jl(lpixl:hpixl,mnrowl:mxrowl),'r');
-        plot(handles.axes2, omega(lpixr:hpixr),jr(lpixr:hpixr,mnrowr:mxrowr),'g');
-        % Plot Wien fits
-        
-        tic
+    % Calculate widths
+    ww = wavelengths(epix(1,:))-wavelengths(spix(1,:));
 
-        xlim(handles.axes8,[mnrowl mxrowl]);
-        xlim(handles.axes9,[mnrowr mxrowr]);
-        % Set x-axes limits on cross-section plots
+    % Update GUI boxes
+    set(handles.edit_wavelength_min_left,'string',round(wavelengths(spix(idxl))));
+    set(handles.edit_wavelength_max_left,'string',round(wavelengths(epix(idxl))));
+    set(handles.edit_wavelength_min_right,'string',round(wavelengths(spix(idxr))));
+    set(handles.edit_wavelength_max_right,'string',round(wavelengths(epix(idxr))));
+    
+    % Plot error minimsation data
+    if get(handles.popupmenu_error_min_type,'Value') == 2
+ 
+        axes(handles.plot_emin_left);
+        plot(wavelengths(spix),ael);
+        plot_axes(handles,'plot_emin_left','Start Wavelength (nm)',...
+            'Average Error (K)','Error Minimisation Left','Right',1,1);
         
-        xlim(handles.axes3,[min(microns_l) max(microns_l)]);
-        xlim(handles.axes4,[min(microns_r) max(microns_r)]);
-        % Set x-axes limits on cross-section overlay plots
+        % Plot error minimisation code right
+        axes(handles.plot_emin_right);
+        plot(wavelengths(spix),real(aer));
+        plot_axes(handles,'plot_emin_right','Start Wavelength (nm)',...
+            'Average Error (K)','Error Minimisation Right','Right',1,1);
 
-        hline = get(handles.axes3, 'children');
-        if ~isempty(hline)
-            set(hline(1),'Color',[1 .8 .8]);
-        end
-        % Make previous lines pale
+    elseif get(handles.popupmenu_error_min_type,'Value') == 3
+
+        axes(handles.plot_emin_left);
+        imagesc(sw,ww,1./real(ael))
+        plot_axes(handles,'plot_emin_left','Start Wavelength (nm)',...
+            'Window Width (nm)','Error Minimisation Left','Right',1,0,ww(1),ww(end),sw(1),sw(end));
         
-%         if length(hline) > 20
-%             delete(hline(length(hline)));
-%         end
-%         % Delete old cross-sections
-                
-        hline = get(handles.axes4, 'children');
-        if ~isempty(hline)
-            set(hline(1),'Color',[.8 1 .8]);
-        end
-        % Make previous lines pale
-        
-%         if length(hline) > 20
-%             delete(hline(length(hline)));
-%         end
-%         % Delete old cross-sections
-        
-        errorbar(handles.axes3, microns_l,templ(mnrowl:mxrowl),deltal(mnrowl:mxrowl),'Color','r');
-        set(handles.text21,'string',strcat('Peak = ',num2str(round(maxtempl(counter_2))),'±',num2str(round(errpeakl(counter_2)))));
-        set(handles.text25,'string',strcat('Average = ',num2str(round(avel(counter_2))),'±',num2str(round(stdtempl(counter_2)))));
-        % Plot Temperature cross-section left
-        
-        errorbar(handles.axes4, microns_r,tempr(mnrowr:mxrowr),deltar(mnrowr:mxrowr), 'g');
-        set(handles.text36,'string',strcat('Peak = ',num2str(round(maxtempr(counter_2))),'±',num2str(round(errpeakr(counter_2)))));
-        set(handles.text37,'string',strcat('Average = ',num2str(round(aver(counter_2))),'±',num2str(round(stdtempr(counter_2)))));
-        % Plot Temperature cross-section right
-        
-        errorbar(handles.axes5, elapsedSec, maxtempl, errpeakl, 'ro-');
-        errorbar(handles.axes5, elapsedSec, maxtempr, errpeakr, 'go-');
-        % plot Temperature histories
-        
-        pause(0.01);
-        drawnow;
-        
-        toc
-        timer(counter_2) = toc;
-        assignin('base','timer',timer);
-        
-        pix_dif = (hpixl-lpixl) - (hpixr-lpixr);
-        if pix_dif > 0
-            lpixl = lpixl + pix_dif;
-        elseif pix_dif < 0
-            lpixr = lpixr - pix_dif;
-        end
-        % Ensures pixel range of wien fits are the same despite rounding error
-        
-        wien_file = char(strcat(upath,'/',expname,'/',prefix,num2str(m),'_wien.txt'));
-        wiens = [omega(lpixl:hpixl)' jl(lpixl:hpixl,mnrowl:mxrowl) omega(lpixr:hpixr)' jr(lpixr:hpixr,mnrowr:mxrowr)]; %#ok<NASGU>
-        save(wien_file,'wiens','-ASCII');
-        % Creates unique file name for wien data and saves it
-        
-        section_file = char(strcat(upath,'/',expname,'/',prefix,num2str(m),'_x-sections.txt'));
-        sections = padcat ((mnrowl:mxrowl)', templ(mnrowl:mxrowl)', deltal(mnrowl:mxrowl)', (mnrowr:mxrowr)', tempr(mnrowr:mxrowr)', deltar(mnrowr:mxrowr)'); %#ok<NASGU>
-        save(section_file,'sections','-ASCII');
-        % Creates unique file name for wien data and saves it
-        
-        counter_2 = counter_2 + 1;
-        % Increment Counter
+        axes(handles.plot_emin_right);
+        imagesc(sw,ww,1./real(aer))
+        plot_axes(handles,'plot_emin_right','Start Wavelength (nm)',...
+            'Window Width (nm)','Error Minimisation Left','Right',1,0,ww(1),ww(end),sw(1),sw(end));
+
     end
 
+    % Update ROI box positions
+    [mnll, mxll, mnlr, mxlr, mnrowl,mxrowl,mnrowr, mxrowr] = ROI(handles);
+
 end
 
-result = [code', timestamp',elapsedSec',maxtempl',errpeakl',avel',stdtempl',min_lambda_left',max_lambda_left',maxtempr',errpeakr',aver',stdtempr',min_lambda_right',max_lambda_right'];
-assignin('base', 'result', result);
-% Places results in user workspace
+% Find optimum calibration file
+if get(handles.popupmenu_error_min_type,'Value') == 4
+    
+    % Load previous file path from .MAT file
+    lastpath = matfile('lastpath.mat','Writable',true);
+    
+    % Prompts uder to select folder containing calibration files
+    [allcalfiles,allcalpath]=uigetfile(strcat(lastpath.lastpath,'*.SPE'),...
+        'Select Image(s)','MultiSelect','on');
+    
+    % Update ROI box positions
+    [mnll, mxll, mnlr, mxlr, mnrowl,mxrowl,mnrowr, mxrowr] = ROI(handles);
+    
+    for i=3:length(allcalfiles)
+        
+        % Read in the calibration data and convert to double
+        fid=fopen(strcat(allcalpath,allcalfiles{i}),'r');
+        testcal=fread(fid,[1024,256],'real*4','l');
+        fclose(fid);
+
+        % Calculate temperature Left and Right
+        [templ,~,~,errorl] = Temp(unkl,testcal,hp.sr,wavelengths,lpixl,hpixl,mxrowl,mnrowl,handles,nw,c1);
+        [tempr,~,~,errorr] = Temp(unkr,testcal,hp.sr,wavelengths,lpixr,hpixr,mxrowr,mnrowr,handles,nw,c1);
+        
+        % Determine average T left and right
+        avg_T_l(i) = nanmean(templ);
+        avg_T_r(i) = nanmean(tempr);
+        
+        % Determine average error left and right
+        ael(i) = nanmean(errorl);
+        aer(i) = nanmean(errorr);
+    end
+    
+    % Remove negative errors
+    ael(ael<=0)=NaN;
+    aer(aer<=0)=NaN;
+    
+    % Find minimum error left and right
+    [~,idxl] = min(ael(:));
+    [~,idxr] = min(aer(:));
+
+    % Update optimum calibration files to calmat
+    calmat = matfile('calibration.mat','Writable',true);
+    
+    fid=fopen(strcat(allcalpath,allcalfiles{idxl}),'r');
+    calmat.cal_l=fread(fid,[1024,256],'real*4','l');
+    calmat.name_l=allcalfiles(idxl);
+    fclose(fid);
+    set(handles.edit_calname_left,'string',calmat.name_l);
+    
+    fid=fopen(strcat(allcalpath,allcalfiles{idxr}),'r');
+    calmat.cal_r=fread(fid,[1024,256],'real*4','l');
+    calmat.name_r=allcalfiles(idxr);
+    set(handles.edit_calname_right,'string',calmat.name_r);
+    fclose(fid);
+    
+end
+
+% Calculate temperature Left and Right
+[Tl,Jl,El,Eel,el,rl,SSDl,paramsl,fitl,lpixl,hpixl] = Temp(unkl,caldata_l,hp.sr,...
+    wavelengths,mnll,mxll,mxrowl,mnrowl,handles,nw,c1);
+[Tr,Jr,Er,Eer,er,rr,SSDr,paramsr,fitr,lpixr,hpixr] = Temp(unkr,caldata_r,hp.sr,...
+    wavelengths,mnlr,mxlr,mxrowr,mnrowr,handles,nw,c1);
+
+% Determine fit with minimum SSD left and right
+[a,idxl] = min(SSDl(:));
+[b,idxr] = min(SSDr(:));
+
+% Plot Wien fit Left
+axes(handles.plot_wien_left)
+cla
+plot(nw,fitl(:,idxl),'r-','LineWidth',2)
+hold on
+plot(nw,Jl(:,idxl),'o','Color',[0 0 0]+0.5,'MarkerFaceColor',[0 0 0]+0.5,'MarkerSize',1);
+plot(nw(lpixl:hpixl),Jl(lpixl:hpixl,idxl),'bo','MarkerFaceColor','b','MarkerSize',1)
+
+% Plot residuals Left
+axes(handles.plot_residuals_left)
+cla
+plot(nw,zeros(1,length(nw)),'r-','LineWidth',2);
+hold on
+%plot(nw,Jl(:,idxl)-fitl(:,idxl),'o','Color',[0 0 0]+0.5,'MarkerFaceColor',[0 0 0]+0.5,'MarkerSize',2)
+plot(nw(lpixl:hpixl),Jl(lpixl:hpixl,idxl)-fitl(lpixl:hpixl,idxl),'bo','MarkerFaceColor','b','MarkerSize',1)
+
+% Plot Wien fit Right
+axes(handles.plot_wien_right)
+cla
+plot(nw,fitr(:,idxr),'r-','LineWidth',2)
+hold on
+plot(nw,Jr(:,idxr),'o','Color',[0 0 0]+0.5,'MarkerFaceColor',[0 0 0]+0.5,'MarkerSize',1);
+plot(nw(lpixr:hpixr),Jr(lpixr:hpixr,idxr),'bo','MarkerFaceColor','b','MarkerSize',1)
+
+% Plot residuals Right
+axes(handles.plot_residuals_right)
+cla
+plot(nw,zeros(1,length(nw)),'r-','LineWidth',2);
+hold on
+%plot(nw,Jr(:,idxr)-fitr(:,idxr),'o','Color',[0 0 0]+0.5,'MarkerFaceColor',[0 0 0]+0.5,'MarkerSize',2)
+plot(nw(lpixr:hpixr),Jr(lpixr:hpixr,idxr)-fitr(lpixr:hpixr,idxr),'bo','MarkerFaceColor','b','MarkerSize',1)
+
+% Convert pixels to microns
+microns_l = linspace(-(mxrowl-mnrowl+2/2).*.52,(mxrowl-mnrowl+2/2).*.52,mxrowl-mnrowl+1);
+microns_r = linspace(-(mxrowr-mnrowr+2/2).*.52,(mxrowr-mnrowr+2/2).*.52,mxrowr-mnrowr+1);
+
+% Get max, min and mean T values and errors on the Left
+[maxtempl,idx] = max(Tl);
+emaxl=el(idx);
+[mintempl,idx] = min(Tl);
+eminl=el(idx);
+meantempl = nanmean(Tl);
+emeanl=(nanstd(Tl)/((mxrowl-mnrowl)^(1/2)))+nanmean(el);
+
+% Get max, min and mean T values and errors on the Right
+[maxtempr,idx] = max(Tr);
+emaxr=er(idx);
+[mintempr,idx] = min(Tr);
+eminr=er(idx);
+meantempr = nanmean(Tr);
+emeanr=(nanstd(Tr)/((mxrowr-mnrowr)^(1/2)))+nanmean(er);
+
+% Plot temperature history
+axes(handles.plot_history)
+% Plot mean
+errorbar(elapsedSec,meantempl,emeanl,'-o', 'Color','r', 'MarkerEdgeColor','r', 'MarkerFaceColor','r');
+errorbar(elapsedSec,meantempr,emeanr,'-o', 'Color','g', 'MarkerEdgeColor','g', 'MarkerFaceColor','g');
+% Plot max
+errorbar(elapsedSec,maxtempl,emaxl,'-s', 'Color','r', 'MarkerEdgeColor','r', 'MarkerFaceColor','r');
+errorbar(elapsedSec,maxtempr,emaxr,'-s', 'Color','g', 'MarkerEdgeColor','g', 'MarkerFaceColor','g');
+
+% Plot Temperature cross-section left
+axes(handles.plot_section_left)
+errorbar(microns_l,Tl,el,'Color','r');
+set(handles.text_max_left,'string',sprintf('Max = %.0f±%.0f',maxtempl,emaxl))
+set(handles.text_min_left,'string',sprintf('Min = %.0f±%.0f',mintempl,eminl))
+set(handles.text_average_left,'string',sprintf('Average = %.0f±%.0f',meantempl,emeanl))
+
+% Plot Temperature cross-section right
+axes(handles.plot_section_right)
+errorbar(microns_r,Tr,er,'Color','r');
+set(handles.text_max_right,'string',sprintf('Max = %.0f±%.0f',maxtempr,emaxr))
+set(handles.text_min_right,'string',sprintf('Min = %.0f±%.0f',mintempr,eminr))
+set(handles.text_average_right,'string',sprintf('Average = %.0f±%.0f',meantempr,emeanr))
+
+% Set x-axes limits on cross-section plots
+xlim(handles.plot_section_pixels_left,[mnrowl mxrowl]);
+xlim(handles.plot_section_pixels_right,[mnrowr mxrowr]);
+xlim(handles.plot_section_left,[microns_l(1) microns_l(end)]);
+xlim(handles.plot_section_right,[microns_r(1) microns_r(end)]);
+
+if get(handles.radiobutton_save_output,'Value') == 1
+    expname = strsplit(filename,'.sif');
+    expname = expname(1);
+    output_path = strcat(file_path, output_folder, '/');
+
+    wien_file = char(strcat(output_path,expname,'_wien.txt'));
+    wiens = padcat(nw,double(Jl(:,idxl)),fitl(:,idxl),nw,double(Jr(:,idxr)),fitr(:,idxr)); %#ok<NASGU>
+    save(wien_file,'wiens','-ASCII');
+    % Creates unique file name for wien data and saves it
+
+    section_file = char(strcat(output_path,expname,'_x-sections.txt'));
+    sections = padcat((mnrowl:mxrowl)', microns_l', Tl', el', El', Eel', (mnrowr:mxrowr)', microns_r', Tr', er', Er', Eer'); %#ok<NASGU>
+    save(section_file,'sections','-ASCII');
+    % Creates unique file name for wien data and saves it
+    
+     % On first pass
+    if i == 1
+        
+        % Open summary file
+        fid = fopen(char(strcat(output_path,'/','SUMMARY.txt')),'a');
+
+        % Write header to file
+        fprintf(fid,'%20s\t%15s\t%10s\t%10s\t%10s\t%10s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t\n','',...
+            '','','LEFT','','','','','','RIGHT','','','','','');
+        fprintf('%20s\t%15s\t%10s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t\n','filename',...
+            'timestamp','time (s)','Max T','e (K)',...
+            'Min T','e (K)','Avg T','e (K)',...
+            'Max T','e (K)','Min T','e (K)',...
+            'Avg T','e (K)');
+        
+        % Write header to workspace
+        fprintf('%20s\t%15s\t%10s\t%10s\t%10s\t%10s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t%5s\t\n','',...
+            '','','LEFT','','','','','','RIGHT','','','','','');
+        fprintf('%20s\t%15s\t%10s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t%10s\t%5s\t\n','filename',...
+            'timestamp','time (s)','Max T','e (K)',...
+            'Min T','e (K)','Avg T','e (K)',...
+            'Max T','e (K)','Min T','e (K)',...
+            'Avg T','e (K)');
+    end
+    
+    % re-open summary file
+    fid = fopen(char(strcat(output_path,'/','SUMMARY.txt')),'a');
+    
+    % Write summary data to file
+    fprintf(fid,'\n%20s\t%15d\t%10.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\n',...
+        filename(1:end-4),timestamp,elapsedSec,maxtempl,emaxl,mintempl,eminl,...
+        meantempl,emeanl,maxtempr,emaxr,mintempr,eminr,...
+        meantempr,emeanr);
+    
+    % Write summary data to workspace
+    fprintf('\n%20s\t%15d\t%10.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\t%10.0f\t%5.0f\n',...
+        filename(1:end-4),timestamp,elapsedSec,maxtempl,emaxl,mintempl,eminl,...
+        meantempl,emeanl,maxtempr,emaxr,mintempr,eminr,...
+        meantempr,emeanr);
+    
+    fclose(fid);
+end

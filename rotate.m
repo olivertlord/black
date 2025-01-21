@@ -1,4 +1,4 @@
-function rotate(handles,upath)
+function rotate(handles)
 %--------------------------------------------------------------------------
 % ROTATE
 %--------------------------------------------------------------------------
@@ -35,34 +35,38 @@ function rotate(handles,upath)
 
 
 %--------------------------------------------------------------------------
-clear unkdata unkdatab caldata maxtemp maxtemp1 aveerr1 mnlam1 mxlam1
-% Clear variables
-
-[~, ~, ~, ~, ~, ~, ~, row, col, ~, ~, ~, ~, mnrowl, mxrowl, mnrowr,...
-    mxrowr, lpixl, hpixl, lpixr, hpixr] = ROI(handles);
+[mnll, mxll, mnlr, mxlr, mnrowl, mxrowl, mnrowr, mxrowr] = ROI(handles)
 % Get GUI box values
 
-% Load calibration data
-load('calibration.mat');
+% Load previous file path from .MAT file
+calmat = matfile('calibration.mat','Writable',true);
 
-filename = get(handles.edit20,'String');
-fid=fopen(strcat(upath,filename),'r');
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
+
+% Read in hardware parameters
+hp = matfile('hardware_parameters.mat','Writable',true);
+
 % Get current filename
+filename = (get(handles.edit_filename,'String'));
+fid=fopen(strcat(unkmat.path,filename),'r');
 
-unkdata=fread(fid,[col row],'real*4','l');
+unkdata=unkmat.unk
 % Reads in unknown file
 
-unkdata(unkdata> 8.4077e-41)=NaN;
+unkdata(unkdata> 64000)=NaN;
 % Removes saturated pixels
 
-ninl = unkdata./cal_l;
-ninr = unkdata./cal_r;
-% Normalize unknown data to calibration data
+lpixl = 1;
+hpixl = 1024;
 
-for i = lpixl:hpixl    
+lpixr = 1;
+hpixr = 1024;
+
+for i = 1:1024    
     % For every column of pixels within the ROI on the left
     
-    spline_L = spline([mnrowl:mxrowl],ninl(i,mnrowl:mxrowl),[mnrowl:0.01:mxrowl]); %#ok<NBRAK>
+    spline_L = spline([mnrowl:mxrowl],unkdata(i,mnrowl:mxrowl),[mnrowl:0.01:mxrowl]); %#ok<NBRAK>
     % Do spline fit to interpolate peak in intensity data at 0.01 pixel
     % resolution
     
@@ -74,10 +78,10 @@ for i = lpixl:hpixl
     
 end
 
-for i = lpixr:hpixr
+for i = 1:1024
     % For every column of pixels within the ROI on the right
 
-    spline_R = spline([mnrowr:mxrowr],ninr(i,mnrowr:mxrowr),[mnrowr:0.01:mxrowr]);  %#ok<NBRAK>
+    spline_R = spline([mnrowr:mxrowr],unkdata(i,mnrowr:mxrowr),[mnrowr:0.01:mxrowr]);  %#ok<NBRAK>
     % Do spline fit to interpolate peak in intensity data at 0.01 pixel
     % resolution    
     
@@ -96,32 +100,32 @@ strike_L = polyfit([lpixl:hpixl]',peak_l(lpixl:hpixl)',1); %#ok<NBRAK>
 strike_R = polyfit([lpixr:hpixr]',peak_r(lpixr:hpixr)',1); %#ok<NBRAK>
 % Determine slope of peak on the CCD using a linear fit
 
-tilt_L = atand(strike_L(1)/1); %#ok<NASGU>
-tilt_R = atand(strike_R(1)/1); %#ok<NASGU>
+tilt_L = atand(strike_L(1)/1);
+tilt_R = atand(strike_R(1)/1);
 % Convert slope to tilt angle in degrees
 
 save('rotfile.mat','tilt_L','tilt_R')
 % Save tilt angles in .MAT file
 
-axes(handles.axes6)
+axes(handles.plot_emin_left)
 plot([1:hpixl],peak_l,'bo',[1:1024],polyval(strike_L,1:1:1024),'r-'); %#ok<NBRAK>
-plot_axes('pixels', 'pixels', 'Slope', 'Right',1)
+plot_axes(handles, 'plot_emin_left', 'pixels', 'pixels', 'Slope', 'Right', 1, 1)
 ylim([min(peak_l)-1 max(peak_l)+1]);
 xlim([lpixl hpixl])
 % Plot spline fit resilte left
 
-axes(handles.axes7)
+axes(handles.plot_emin_right)
 plot([1:hpixr],peak_r,'bo',[1:1024],polyval(strike_R,1:1:1024),'r-'); %#ok<NBRAK>
-plot_axes('pixels', 'pixels', 'Slope', 'Right',1)
+plot_axes(handles, 'plot_emin_right', 'pixels', 'pixels', 'Slope', 'Right', 1, 1)
 ylim([min(peak_r)-1 max(peak_r)+1]);
 xlim([lpixr hpixr])
 % Plot spline fit resilte right
 
-set(handles.radiobutton8,'Value',1);
+set(handles.radiobutton_auto_rotate,'Value',1);
 % Set "rotate" radiobutton to on
 
-pause(5);
+pause(2);
 % Pause to allow user to see results
 
-Tcalc(handles, eval(get(handles.edit22,'string')), eval(get(handles.edit21,'string')), eval(get(handles.edit22,'string')), upath, filename((1:end-(4+length(get(handles.edit21,'string'))))),getappdata(0,'calpath'))
+Tcalc(handles, unkdata, calmat.cal_l, calmat.cal_r, hp, unkmat.wavelengths, i)
 % Run Tcalc

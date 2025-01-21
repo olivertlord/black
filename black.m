@@ -56,12 +56,10 @@ function varargout = black(varargin)
 
 % Edit the above text to modify the response to help black
 
-% Last Modified by GUIDE v2.5 21-Feb-2019 16:01:06
-
+% Last Modified by GUIDE v2.5 30-Aug-2019 21:12:11
 
 %--------------------------------------------------------------------------
-% Begin initialization code - DO NOT EDIT
-
+% GUIDE GENERATED INITIALIZATION CODE
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -79,50 +77,80 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 
-% --- Executes just before IRS is made visible. ---------------------------
+%--------------------------------------------------------------------------
+% GUIDE GENERATED CREATE FUNCTIONS FOR GUI ELEMENTS
+function edit_wavelength_min_left_CreateFcn(hObject, ~, ~) %#ok<INUSD>
 
+function edit_wavelength_max_left_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_ROI_min_left_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_ROI_max_left_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_calname_right_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_calname_left_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_wavelength_min_right_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_wavelength_max_right_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_ROI_min_right_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_ROI_max_right_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_filename_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_file_max_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function edit_file_min_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function popupmenu_fit_type_CreateFcn(hObject, ~, ~) %#ok<INUSD>
+
+function popupmenu_error_min_type_CreateFcn(~, ~, ~)
+
+function edit_Background_File_CreateFcn(~, ~, ~)
+
+
+%--------------------------------------------------------------------------
+% GUIDE GENERATED OPENING FUNCTION
+% Executes just before black is made visible.
 function black_OpeningFcn(hObject, ~, handles, varargin)
 
-arrayfun(@cla,findall(0,'type','axes'));
-setappdata(0,'increment_flag',0);
-setappdata(0,'auto_flag',0);
-% Clears all figures and initialises flags
+% Sets button and edit box state
+control_colors({1 1 0 0 1 0 0 0 1 1 1 1 1 1 1 1 1 1},handles)
 
-set(gcf, 'MenuBar', 'none');
-set(gcf, 'ToolBar', 'none');
-% Hides menubar and toolbar in figure window
-
-axes(handles.axes1)
-plot_axes('w', 'j', 'Wien Fits','Left',1)
-axes(handles.axes2)
-plot_axes('w', 'j', 'Wien Fits','Right',1)
-axes(handles.axes3)
-plot_axes('microns', 'Temperature (K)', '', 'Left',0)
-axes(handles.axes4)
-plot_axes('microns', 'Temperature (K)', '', 'Right',0)
-axes(handles.axes5)
-plot_axes('Elapsed Time (S)', 'Peak Temperature (K)', 'Temperature History', 'Right',0)
-axes(handles.axes6)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
-axes(handles.axes7)
-plot_axes('min lambda (nm)', 'Average Error (K)', 'Error Minimisation', 'Right',1)
-
-axes(handles.axes8)
-plot_axes('pixels', '', '', 'Right',1)
-uistack(handles.axes8,'bottom');
-grid(handles.axes8,'on')
-
-axes(handles.axes9)
-plot_axes('pixels', '', '', 'Left',1)
-uistack(handles.axes9,'bottom');
-grid(handles.axes9,'on')
-
-axes(handles.axes10)
-plot_axes('pixels', 'pixels', 'RAW CCD IMAGE', 'Right',0)
 % Sets titles and labels of figures by calling function plot_axes
+plot_axes(handles,'plot_wien_left','w', 'j', 'Wien fits','Left',1,1)
 
-setappdata(0,'handles',handles);
-% Put handles structure into appdata
+plot_axes(handles,'plot_residuals_left','w', '', '','Left',1,1)
+
+plot_axes(handles,'plot_wien_right','w', 'j', 'Wien fits','Right',1,1)
+
+plot_axes(handles,'plot_residuals_right','w', '', '','Right',1,1)
+
+plot_axes(handles,'plot_section_left','microns', 'Temperature (K)',...
+    '', 'Left',0,1)
+
+plot_axes(handles,'plot_section_pixels_left','pixels', '',...
+    'Cross-sections', 'Left',1,1)
+
+plot_axes(handles,'plot_section_right','microns','Temperature (K)',...
+    '','Right',0,1)
+
+plot_axes(handles,'plot_section_pixels_right','pixels', '',...
+    'Cross-sections', 'Right',1,1)
+
+plot_axes(handles,'plot_history','Elapsed Time (S)',...
+    'Peak Temperature (K)','Temperature History', 'Right',0,1)
+
+plot_axes(handles,'plot_emin_left','min lambda (nm)',...
+    'Average Error (K)','Error Minimisation', 'Right',1,1)
+
+plot_axes(handles,'plot_emin_right','min lambda (nm)',...
+    'Average Error (K)','Error Minimisation', 'Right',1,1)
+
+plot_axes(handles,'plot_raw','pixels','pixels','RAW CCD IMAGE','Right',0,1)
 
 % Choose default command line output for IRS
 handles.output = hObject;
@@ -131,353 +159,500 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % Load current calibration file names
-load('calibration.mat');
-set(handles.edit2,'string',name_l);
-set(handles.edit12,'string',name_r);
+load('calibration.mat'); 
+set(handles.edit_calname_left,'string',name_l);
+set(handles.edit_calname_right,'string',name_r);
 
-% --- Outputs from this function are returned to the command line. --------
+% Initialise file_counter
+file_counter = 1;
 
+% Initialise increment_flag
+increment_flag = 0;
+
+% Store file_counter in AppData
+setappdata(0,'file_counter',file_counter);
+
+% Initialise auto_flag
+setappdata(0,'auto_flag',0);
+
+% Set increment flag
+setappdata(0,'increment_flag',increment_flag)
+
+% Store handles structures in AppData
+setappdata(0,'handles',handles)
+
+% Read in hardware parameters
+hp = matfile('hardware_parameters.mat','Writable',true);
+
+% Update wavelengths based on current hardware parameters
+pixels = 1:1024;
+hp.w = hp.conp+hp.pix1.*pixels+hp.pix2.*pixels.^2;
+
+%--------------------------------------------------------------------------
+% GUIDE GENERATED OUTPUT FUNCTION
 function varargout = black_OutputFcn(~, ~, handles) 
 
 varargout{1} = handles.output;
 
-% --- Create functions: Execute during object creation, after setting all -
-% properties --------------------------------------------------------------
-
-function edit2_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit7_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit8_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit9_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit10_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit12_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit15_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit16_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit17_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit18_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit20_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit21_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function edit22_CreateFcn(hObject, ~, ~)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-% --- Callback functions with no content ----------------------------------
-
-function edit2_Callback(~, ~, ~) %#ok<*DEFNU>
-function edit12_Callback(~, ~, ~)
-function edit20_Callback(~, ~, ~)
-function edit21_Callback(~, ~, ~)
-function edit22_Callback(~, ~, ~)
-function radiobutton1_Callback(~,~,~)
-function radiobutton2_Callback(~,~,~)
-function radiobutton6_Callback(~,~,~)
-function radiobutton8_Callback(~, ~, ~)
-function radiobutton34_Callback(~, ~, ~)
-function popupmenu1_Callback(~, ~, ~)
-
-% --- Callback  functions with content ------------------------------------
-
-function edit7_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
-function edit8_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
-function edit9_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
-function edit10_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
-function edit15_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
-function edit16_Callback(~, ~, handles)
-
-ROI(handles)
-
-function edit17_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
-function edit18_Callback(~, ~, handles)
-
-ROI(handles)
-% Updates ROI boxes by calling function ROI
-
 %--------------------------------------------------------------------------
-% --- Executes when user clisks on the Update Calibration Image button
-function pushbutton1_Callback(~, ~, handles) %#ok<DEFNU>
+% CALLBACK FUNCTIONS
+
+%--- LEFT MIN WAVELENGTH EDIT BOX -----------------------------------------
+function edit_wavelength_min_left_Callback(~, ~, handles) %#ok<*DEFNU>
+
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
+unkmat.wavelengths
+% Prevent user going beyond range
+if eval(get(handles.edit_wavelength_min_left,'string')) < unkmat.wavelengths(1,1)
+    set(handles.edit_wavelength_min_left,'string',num2str(round(unkmat.wavelengths(1,1))));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- LEFT MAX WAVELENGTH EDIT BOX -----------------------------------------
+function edit_wavelength_max_left_Callback(~, ~, handles)
+
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
+
+% Prevent user going beyond range
+if eval(get(handles.edit_wavelength_max_left,'string')) > unkmat.wavelengths(1,end)
+    set(handles.edit_wavelength_max_left,'string',num2str(round(unkmat.wavelengths(1,end))));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- LEFT MIN ROI EDIT BOX ------------------------------------------------
+function edit_ROI_min_left_Callback(~, ~, handles)
+
+% Prevent user going beyond range
+if eval(get(handles.edit_ROI_min_left,'string')) < 128
+    set(handles.edit_ROI_min_left,'string',num2str(128));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- LEFT MAX ROI EDIT BOX ------------------------------------------------
+function edit_ROI_max_left_Callback(~, ~, handles)
+
+% Prevent user going beyond range
+if eval(get(handles.edit_ROI_max_left,'string')) > 256
+    set(handles.edit_ROI_max_left,'string',num2str(256));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- RIGHT MIN WAVELENGTH EDIT BOX -----------------------------------------
+function edit_wavelength_min_right_Callback(~, ~, handles) %#ok<*DEFNU>
+
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
+
+% Prevent user going beyond range
+if eval(get(handles.edit_wavelength_min_right,'string')) < unkmat.wavelengths(1,1)
+    set(handles.edit_wavelength_min_right,'string',num2str(round(unkmat.wavelengths(1,1))));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- RIGHT MAX WAVELENGTH EDIT BOX -----------------------------------------
+function edit_wavelength_max_right_Callback(~, ~, handles)
+
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
+
+% Prevent user going beyond range
+if eval(get(handles.edit_wavelength_max_right,'string')) > unkmat.wavelengths(1,end)
+    set(handles.edit_wavelength_max_right,'string',num2str(round(unkmat.wavelengths(1,end))));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- RIGHT MIN ROI EDIT BOX ------------------------------------------------
+function edit_ROI_min_right_Callback(~, ~, handles)
+
+% Prevent user going beyond range
+if eval(get(handles.edit_ROI_min_right,'string')) < 1
+    set(handles.edit_ROI_min_right,'string',num2str(1));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- RIGHT MAX ROI EDIT BOX ------------------------------------------------
+function edit_ROI_max_right_Callback(~, ~, handles)
+
+% Prevent user going beyond range
+if eval(get(handles.edit_ROI_max_right,'string')) > 128
+    set(handles.edit_ROI_max_right,'string',num2str(128));
+end
+
+% Updates ROI boxes by calling function ROI
+ROI(handles)
+
+%--- POPUP MENU FIT TYPE --------------------------------------------------
+function popupmenu_fit_type_Callback(~, ~, ~)
+
+%--- RADIOBUTTON AUTO ROTATE ----------------------------------------------
+function radiobutton_auto_rotate_Callback(~, ~, ~)
+
+%--- RADIOBUTTON T CORRECTION ---------------------------------------------
+function radiobutton_T_correction_Callback(~, ~, ~)
+
+%--- RADIOBUTTON ERROR MIN ------------------------------------------------
+function radiobutton_error_min_Callback(~, ~, ~)
+
+%--- RADIOBUTTON W EMISSIVITY ---------------------------------------------
+function radiobutton_W_emissivity_Callback(~, ~, ~)
+
+%--- RADIOBUTTON SMOOTH ---------------------------------------------------
+function slider_smooth_Callback(~, ~, handles)
+
+% Update text box when slider is changed
+smooth = ceil(get(handles.slider_smooth,'Value'));
+set(handles.text_smooth,'String',num2str(smooth));
+
+%--- RADIOBUTTON DESATURATE -----------------------------------------------
+function radiobutton_desaturate_Callback(~, ~, ~)
+
+%--- RADIOBUTTON SAVE OUTPUT ----------------------------------------------
+function radiobutton_save_output_Callback(~, ~, ~)
+
+%--- UPDATE CALIBRATION FILE PUSHBUTTON -----------------------------------
+function pushbutton_update_calibration_files_Callback(~, ~, handles)
 
 % Load current calibration data
 calmat = matfile('calibration.mat','Writable',true);
 
-% Extracts path to folder containing black
-split_path = strsplit(mfilename('fullpath'), 'black');
+% User selects left calibration file
+[calmat.name_l, calmat.path] = uigetfile(strcat(calmat.path,'*.SPE;*.sif'),...
+    'Winspec Calibration File - LEFT'); 
+set(handles.edit_calname_left,'string',calmat.name_l);
 
-% Creates path to black
-home_path = strcat(split_path{1},'black',split_path{2});
-
-% User points to left calibration file. File browser starts in calibration
-% folder regardless of the path to black
-[cfilel, calpath] = uigetfile(strcat(home_path,'calibration/*.SPE'),...
-    'Winspec Calibration File - LEFT'); %#ok<ASGLU>
-set(handles.edit2,'string',cfilel);
-
-% User points to right calibration file. File browser starts in calibration
-% folder regardless of the path to black
-[cfiler, calpath] = uigetfile(strcat(home_path,'calibration/*.SPE'),...
+% User selects right calibration file
+[calmat.name_r, calmat.path] = uigetfile(strcat(calmat.path,'*.SPE;*.sif'),...
     'Winspec Calibration File - RIGHT');
-set(handles.edit12,'string',cfiler);
+set(handles.edit_calname_right,'string',calmat.name_r);
 
-% Read in left hand calibration data and convert to double
-fid=fopen(strcat(calpath,cfilel),'r');
-cal_data_l=fread(fid,[1024,256],'real*4','l');
-fclose(fid);
+% Read .sif files from iDus detector using Andor sifreader
+if strcmp(calmat.name_l(1,end-2:end), 'sif') == 1
+    
+    disp('check')
+    [calmat.cal_l,calmat.wavelengths] = sifreader(strcat(calmat.path,calmat.name_l));
+    [calmat.cal_r,calmat.wavelengths] = sifreader(strcat(calmat.path,calmat.name_r));
+    
+    % Remove saturated pixels
+    %calmat.cal_l(calmat.cal_l> 64000) = NaN;
+    %calmat.cal_r(calmat.cal_r> 64000) = NaN;
 
-% Read in right hand calibration data and convert to double
-fid=fopen(strcat(calpath,cfiler),'r');
-cal_data_r=fread(fid,[1024,256],'real*4','l');
-fclose(fid);
+% Read .spe files from PIXIS detector
+elseif strcmp(calmat.name_l(1,end-2:end),'spe') == 1
+    
+    fid=fopen(strcat(calmat.path,calmat.name_l),'r');
+    calmat.cal_l=fread(fid,[1024,256],'real*4','l');
+    fclose(fid);
+    
+    fid=fopen(strcat(calmat.path,calmat.name_r),'r');
+    calmat.cal_r=fread(fid,[1024,256],'real*4','l');
+    fclose(fid);
+    
+    % Remove saturated pixels
+    calmat.cal_l(calmat.cal_l> 8.4077e-41) = NaN;
+    calmat.cal_r(calmat.cal_r> 8.4077e-41) = NaN;
+end
+%--- UNKNOWN FILE PUSHBUTTON ----------------------------------------------
+function pushbutton_unknown_file_Callback(~, ~, handles)
 
-% Save data to .MAT file
-calmat.cal_l = cal_data_l;
-calmat.cal_r = cal_data_r;
-calmat.name_l = cfilel;
-calmat.name_r = cfiler;
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
 
-% Put calibration file path into appdata
-setappdata(0,'calpath',calpath);
+% Prompts uder to select unknown file(s)
+[unkmat.names,unkmat.path]=uigetfile(strcat(unkmat.path,'*.SPE;*.sif'),...
+    'Select Image(s)','MultiSelect','on');
 
-% --- User sets unknown file ----------------------------------------------
-function pushbutton29_Callback(~, ~, handles)
+% Ensure filenames are strings
+if ischar(unkmat.names(1,:)) == true
+    filenames = cellstr(unkmat.names);
+else
+    filenames = unkmat.names;
+end
 
-[ufile,upath]=uigetfile('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File');
-set(handles.edit20,'string',ufile);
-setappdata(0,'upath',upath);
-% User selects file, apply name to GUI box, add path to appdata for later
-% use
+% Prints first filename to GUI
+set(handles.edit_filename,'string',filenames);
 
-[~, filenumber, prefix] = file_enumerator (upath, ufile);
-% Function enumerator called to determine filenumber from filename
+% Read first .sif file to check wavelength using Andor sifreader
+[unkmat.unk,unkmat.wavelengths] = sifreader(strcat(unkmat.path,...
+            filenames{1}));
 
-set(handles.edit22,'string',num2str(filenumber));
-set(handles.edit21,'string',num2str(filenumber));
-% Set initial and last file number boxes in GUI
+data_prep(handles,unkmat.path,filenames{1},1);
 
-data_prep(handles,filenumber,prefix,filenumber,1024,256);
+% Initializes file_counter
+file_counter = 1;
 
+% Stores file_counter in AppData
+setappdata(0,'file_counter',file_counter);
+
+% Update button and edit box state
+if length(unkmat.names) < 2
+    control_colors({1 1 0 0 1 1 1 0 1 1 1 1 1 1 1 1 1 1},handles)
+elseif length(unkmat.names) >= 2
+    control_colors({1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 1 1},handles)
+end
+
+% Update wavelength range boxes
+set(handles.edit_wavelength_min_left,'string',num2str(round(min(unkmat.wavelengths))));
+set(handles.edit_wavelength_max_left,'string',num2str(round(max(unkmat.wavelengths))));
+set(handles.edit_wavelength_min_right,'string',num2str(round(min(unkmat.wavelengths))));
+set(handles.edit_wavelength_max_right,'string',num2str(round(max(unkmat.wavelengths))));
+
+% Updates ROI boxes by calling function ROI
 ROI(handles)
 
-% --- FILE RANGE MODE - FIT BUTTON-----------------------------------------
-function pushbutton30_Callback(~, ~, handles)
+%--- CHOOSE BACKGROUND FILE -----------------------------------------------
+function pushbutton_background_file_Callback(~, ~, handles)
 
-if getappdata(0,'auto_flag') < 2 && get(handles.radiobutton41,'Value') == 0
-    arrayfun(@cla,findall(0,'type','axes'));
+% Read in hardware parameters
+hp = matfile('hardware_parameters.mat','Writable',true);
+
+% Load previous file path from .MAT file
+unkmat = matfile('unknown.mat','Writable',true);
+
+% Prompts uder to select unknown file(s)
+[backfile,backpath]=uigetfile(strcat(unkmat.path,'*.SPE;*.SIF'),...
+    'Select Background Image(s)');
+
+% Read .sif files using Andor sifreader
+if strcmp(backfile(1,end-2:end), 'sif') == 1
+    backdata = sifreader(strcat(backpath,backfile));
+
+% Read .spe files
+elseif strcmp(calmat.name_l(1,end-2:end),'spe') == 1
+    fid=fopen(strcat(backpath,backfile),'r');
+    backdata=fread(fid,[hp.col hp.row],'real*4','l');
 end
-% Clear all plots within GUI
 
-ufile = get(handles.edit20,'string');
-% Get name of unknown file from GUI box
+% Prints background filename to GUI
+set(handles.edit_Background_File,'string',backfile);
 
-upath = getappdata(0,'upath');
-% Get unknown file path from appdata
+% Store list of selected files in AppData
+setappdata(0,'backdata',backdata);
 
-calpath = getappdata(0,'calpath');
-% Get calibration file path from appdata
+% --- DECREMENT PUSHBUTTON ------------------------------------------------
+function pushbutton_decrement_Callback(~, ~, handles)
 
-dir_content = dir(strcat(upath,'*.SPE'));
+% Get list of stored files from AppData
+ufiles = getappdata(0,'ufiles');
 
-[filelist, filenumber, prefix] = file_enumerator (upath, ufile);
-% Call enumerator to extract complete file listing unless in auto mode
+% Get current file
+current_file = get(handles.edit_filename,'String');
 
-auto_flag = getappdata(0,'auto_flag');
-% Get auto_flag state
+% Get the current position
+idx = strfind(ufiles,current_file);
+file_counter = find(not(cellfun('isempty',idx)));
 
-if auto_flag ~= 0
-    set(handles.edit21,'string',num2str(filenumber));
-    set(handles.edit22,'string',num2str(filenumber));
+% Unless we are at the beginning of the list
+if file_counter > 1
+    
+    % Decrement file_counter
+    file_counter = file_counter - 1;
+    
+    % Store updated value in AppData
+    setappdata(0,'file_counter',file_counter)
+    
 end
-% Set GUI boxes to current filenumber if in auto mode
 
-fi = eval(get(handles.edit22,'string'));
-fl = eval(get(handles.edit21,'string'));
-% Get file range from GUI boxes
+% Set increment flag
+setappdata(0,'increment_flag',1)
+
+% Execute process pushbutton code    
+pushbutton_process_Callback([],[],handles)
+
+% --- INCREMENT PUSHBUTTON ------------------------------------------------
+function pushbutton_increment_Callback(~, ~, handles)
+
+% Get list of stored files from AppData
+ufiles = getappdata(0,'ufiles');
+
+% Get current file
+current_file = get(handles.edit_filename,'String');
+assignin('base','ufiles',ufiles)
+
+% Get the current position
+idx = strfind(ufiles,current_file);
+file_counter = find(not(cellfun('isempty',idx)));
+
+% Unless we are at the end of the list
+if file_counter < length(ufiles)
     
-if fl<fi
-    fl = fi;
-    set(handles.edit21,'string',num2str(fl));
+    % Decrement file_counter
+    file_counter = file_counter + 1;
+    
+    % Store updated value in AppData
+    setappdata(0,'file_counter',file_counter)    
+    
 end
-% Catches fl<fi user input error
 
-if (fl>1) && (filenumber~=fi)
-    ufile = horzcat(prefix,num2str(fi),'.SPE');
-    set(handles.edit20,'string',ufile);
-end
-% Changes filename if it does not match fi
+% Set increment flag
+setappdata(0,'increment_flag',1)
 
-if get(handles.radiobutton41,'Value') == 1
-    
-    if fl ~= fi
-        history_length = length(filelist(filelist>=fi & filelist<=fl));
-        setappdata(0,'history_length',history_length);
-    end
-    % If user previously fitted a file range, determine the length of that
-    % range to ensure persistent variables are not overwritten
-    
-    [fl, fi] = deal(fl + 1);
-    % Sets GUI boxes to the next file number
-    
-    while fl < max(filelist(:)) && ~ismember(fl,filelist)
-        [fl, fi] = deal(fl + 1);
-    end
-    % Skips over missing files
-    
-    if fl > max(filelist(:))
-        [fl, fi] = deal(max(filelist(:)));
-    end
-    % Prevents user incrmenting beyond max file number in directory
-    
-    ufile = horzcat(prefix,num2str(fi),'.SPE');
-    set(handles.edit20,'string',ufile);
-    set(handles.edit22,'string',num2str(fi));
-    set(handles.edit21,'string',num2str(fl));
-    % Updates GUI boxes to new values
-    
-elseif get(handles.radiobutton41,'Value') == 0 && fi == fl
-    
-    history_length = -1;
-    setappdata(0,'history_length',history_length);
-    % Sets history_length to special value -1 in unique situation in which
-    % user executes a non-incrementing Wien Fit to a single file
+% Execute process pushbutton code
+pushbutton_process_Callback([],[],handles)
 
+% --- PROCESS PUSHBUTTON --------------------------------------------------
+function pushbutton_process_Callback(~, ~, handles)
+
+control_colors({1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1},handles)
+
+
+% Load unknown matfile
+unkmat = matfile('unknown.mat','Writable',true);
+
+% Ensure filenames are strings
+if ischar(unkmat.names(1,:)) == true
+    filenames = cellstr(unkmat.names);
 else
+    filenames = unkmat.names;
+end
+
+% Load calibration matfile
+calmat = matfile('calibration.mat','Writable',true);
+
+% Get wavelengths
+if isempty(strfind(cellstr(unkmat.names(1,:)), 'sif')) == false
+    wavelengths = unkmat.wavelengths;
+elseif isempty(strfind(cellstr(unkmat.names(1,:)), 'spe')) == false
+    hp = matfile('hardware_parameters.mat','Writable',true);
+    wavelengths = hp.w;
+end
+
+% Get current value of file_counter
+file_counter = getappdata(0,'file_counter');
+
+% Get current value of increment flag
+increment_flag = getappdata(0,'increment_flag');
+
+% If increment mode is not selected
+if increment_flag == 0
     
-    history_length = 0;
-    setappdata(0,'history_length',history_length);
-    % Sets history_length to zero in all other cases; i.e. if increment
-    % button is not checked and fi ~= fl
+    % Clear all axes
+    %arrayfun(@cla,findall(0,'type','axes'));
+    
+    filelist = filenames(1,:);
+    
+elseif increment_flag == 1
+    
+    filelist = filenames(file_counter,:);
     
 end
-% Increments current file by one if user has selected radiobutton
 
-[savename, result] = Tcalc(handles, fi, fl, filelist, upath, prefix, calpath); %#ok<ASGLU>
-% Calls Tcalc
+% Prints current filename to GUI
+%set(handles.edit_filename,'String',filelist(file_counter,:));
 
-result_file = char(strcat(upath,'/',savename,'/',savename,'_summary.txt'));
-save(result_file,'result','-ASCII','-double');
-% Saves summary data to text file
+% Reset increment flag
+setappdata(0,'increment_flag',0)
+
+% Oopen file w/ W-lamp spectral radiance values (lamp)
+fid = fopen(strcat(pwd,'/E256.dat'),'r','l');
+for i = 1:58
+    E(i) = fscanf(fid,'%f6.3'); %#ok<AGROW>
+end
+for i = 1:58
+    lam(i)=460+i*10; %#ok<AGROW>
+end
+
+hp.sr = lampcal(wavelengths,lam,E);
+
+% Create a unique folder with date and time if save output radiobutton is 
+% selected
+folder = strcat('output_black_',regexprep(datestr(now),'[\s :]','-'));
+if get(handles.radiobutton_save_output,'Value') == 1
+    
+    mkdir(strcat(unkmat.path,folder));
+    
+    % Copy calibration.mat and hardware_parameters.mat to new folder
+    copyfile(strcat(pwd,'/calibration.mat'),...
+        strcat(unkmat.path,folder,'/calibration.mat'));
+    copyfile(strcat(pwd,'/hardware_parameters.mat'),...
+        strcat(unkmat.path,folder,'/hardware_parameters.mat'));
+
+end
+
+% Create directory if in auto mode and if it doesnt yet exist
+if getappdata(0,'auto_flag') == 1 && exist(strcat(getappdata(0,'upath'),folder),'dir') == 0
+    
+    mkdir(strcat(upath,folder));
+
+end
+
+setappdata(0,'sum_store',zeros(1024,256,length(unkmat.names)));
+
+if getappdata(0,'auto_flag') > 0;
+    timeStart = getappdata(0, 'timeStart');
+else
+    FileInfo = dir(strcat(unkmat.path,filelist{1}));
+    timestamp = datenum(FileInfo.date);
+    timevector = datevec(timestamp);
+    timeStart = (timevector(1,6) + (timevector(1,5)*60) + (timevector(1,4)*60*60));
+end
+    
+for i = 1:length(filelist)
+    [unkdata,skip] = data_prep(handles,unkmat.path,filelist{i},i);
+    FileInfo = dir(strcat(unkmat.path,filelist{i}));
+    timestamp = datenum(FileInfo.date);
+    timevector = datevec(timestamp);
+    timeSec = (timevector(1,6) + (timevector(1,5)*60) + (timevector(1,4)*60*60));
+    elapsedSec = round(timeSec-timeStart);
+    
+    if skip == 0
+        Tcalc(handles, unkmat.path, folder, unkdata, calmat.cal_l, calmat.cal_r, hp, wavelengths, i, elapsedSec, filelist{i}, timestamp);
+    end
+end
 
 % --- CLEAR FIGURES BUTTON ------------------------------------------------
 
-function pushbutton35_Callback(~, ~, ~)
+function pushbutton_clear_figures_Callback(~, ~, ~)
 arrayfun(@cla,findall(0,'type','axes'))
-clear all;   %#ok<CLFUN>
+clear all;  
 clear global;
 fclose('all');
 
 % --- EXIT BUTTON ---------------------------------------------------------
 
-function pushbutton39_Callback(~, ~, ~)
-clear all;   %#ok<CLFUN>
+function pushbutton_quit_Callback(~, ~, ~)
+clear all;
 clear global;
 fclose('all');
 close all;
 
 % --- UPDATE HARDWARE PARAMETERS BUTTON -----------------------------------
 
-function pushbutton44_Callback(hObject, eventdata, handles)
+function pushbutton_update_hardware_parameters_Callback(~, ~, ~)
 hardware_parameters
 
 % --- IMCREMENT MODE ------------------------------------------------------
 
-function radiobutton41_Callback(~, ~, handles)
+function radiobutton_increment_Callback(~, ~, handles)
 
-set(handles.radiobutton5,'enable','on')
+set(handles.pushbutton_live,'enable','on')
 % Enables live mode radiobutton when increment mode is switched off
 
-if get(handles.radiobutton41,'Value') == 1
+if get(handles.radiobutton_increment,'Value') == 1
     
-    set(handles.radiobutton5,'enable','off')
+    set(handles.pushbutton_live,'enable','off')
     % Disables live mode radiobutton when increment mode is switched on
     
 end
 
 % --- AUTO MODE -----------------------------------------------------------
 
-function radiobutton5_Callback(hObject, eventdata, handles)
+function pushbutton_live_Callback(hObject, eventdata, handles)
 
 clear global code timestamp timeSec elapsedSec errpeakl errpeakr...
     maxtempl maxtempr avel stdtempl min_lambda_left max_lambda_left aver...
@@ -491,48 +666,73 @@ setappdata(0,'auto_flag',auto_flag);
 
 buttons = findobj('Style','pushbutton');
 set(buttons, 'enable', 'on')
-set(handles.radiobutton9,'enable','on');
+set(handles.radiobutton_save_output,'enable','on');
 % Enables all buttons when auto mode is switched off
 
-set(handles.radiobutton41,'enable','on')
+%set(handles.radiobutton_increment,'enable','on')
 % Enables increment radiobutton when auto mode is switched off
 
-if get(handles.radiobutton5,'Value') == 1
+if get(handles.pushbutton_live,'Value') == 1
     
     buttons = findobj('Style','pushbutton');
     set(buttons, 'enable', 'off')
     % Disables all buttons when auto mode is switched off
     
-    set(handles.radiobutton41,'enable','off')
+    %set(handles.radiobutton_increment,'enable','off')
     % Disables increment radiobutton in auto mode
     
-    set(handles.radiobutton9,'Value',1);
-    set(handles.radiobutton9,'enable','off');
+    set(handles.radiobutton_save_output,'Value',1);
+    set(handles.radiobutton_save_output,'enable','off');
     
     upath = strcat(uigetdir('C:\Documents and Settings\Oliver Lord\Desktop\Data.SPE','Winspec unknown File'),'/');
     setappdata(0,'upath',upath);
-    dir_content = dir(strcat(upath,'/*.SPE'));
+    
+    dir_content = dir(strcat(upath,'*.sif'));
     initial_list = {dir_content.name};
     % Collect list of current .TIFF files
+    
+    unkmat =  matfile('unknown.mat','Writable',true);
 
-    while get(handles.radiobutton5,'Value') == 1
+    while get(handles.pushbutton_live,'Value') == 1
         pause(0.5)
-        dir_content = dir(strcat(upath,'/*.SPE'));
+        dir_content = dir(strcat(upath,'*.sif'));
         new_list = {dir_content.name};
         % Collects new list of filenames
         new_filename = setdiff(new_list,initial_list);
         % Determines list of new files
 
         if ~isempty(new_filename)
-
+            strcat(upath,new_filename{1})
+            
+            if auto_flag == 0;
+                FileInfo = dir(strcat(upath,new_filename{1}));
+                timestamp = datenum(FileInfo.date);
+                timevector = datevec(timestamp);
+                timeStart = (timevector(1,6) + (timevector(1,5)*60) + (timevector(1,4)*60*60));
+                setappdata(0, 'timeStart', timeStart)
+            end
+            
             auto_flag = auto_flag + 1;
             setappdata(0,'auto_flag',auto_flag);
             % Increments auto_flag each time a new file is processed
             
-            set(handles.edit20,'string',new_filename{end});
+            set(handles.edit_filename,'string',new_filename{1});
             % Update GUI boxes
+            
+            unkmat.names = new_filename{1};
+            unkmat.path = upath;
+            
+            % Read first .sif file to check wavelength using Andor sifreader
+            [unkmat.unk,unkmat.wavelengths] = sifreader(strcat(upath,...
+                new_filename{1}));
 
-            pushbutton30_Callback(hObject, eventdata, handles)
+            % Update wavelength range boxes
+            set(handles.edit_wavelength_min_left,'string',num2str(round(min(unkmat.wavelengths))));
+            set(handles.edit_wavelength_max_left,'string',num2str(round(max(unkmat.wavelengths))));
+            set(handles.edit_wavelength_min_right,'string',num2str(round(min(unkmat.wavelengths))));
+            set(handles.edit_wavelength_max_right,'string',num2str(round(max(unkmat.wavelengths))));
+            
+            pushbutton_process_Callback(hObject, eventdata, handles)
             % Calls main processing subroutine
             
             fclose('all');
@@ -548,15 +748,24 @@ end
 % Enters auto-mode if radiobutton is switched on
 
 % --- UPDATE ROTATION PARAMETERS ------------------------------------------
+function pushbutton_rotate_Callback(~, ~, handles)
+rotate(handles);
 
-function pushbutton43_Callback(~, ~, handles)
+% --- Executes on button press in radiobutton_sum.
+function radiobutton_sum_Callback(~, ~,~)
 
-upath = getappdata(0,'upath');
-% Get unknown data folder path
+% --- Executes on selection change in popupmenu_error_min_type.
+function popupmenu_error_min_type_Callback(~, ~,~)
 
-rotate(handles,upath);
-% Call rotate function
+% --- Executes on button press in radiobutton_subtract_background.
+function edit_Background_File_Callback(~, ~,~)
 
+% --- Executes on button press in radiobutton_subtract_background.
+function radiobutton_subtract_background_Callback(~, ~, handles)
 
-% --- Executes on button press in radiobutton9.
-function radiobutton9_Callback(hObject, eventdata, handles)
+% If the subtract background radiobutton is switched on but there is no
+% background file selected then force user to select one
+if get(handles.radiobutton_subtract_background,'Value') == 1 &&...
+       strcmp(get(handles.edit_Background_File,'string'),'None') == 1
+    pushbutton_background_file_Callback([], [], handles)
+end
