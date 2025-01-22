@@ -111,14 +111,14 @@ axes(handles.plot_emin_left)
 plot([1:hpixl],peak_l,'bo',[1:1024],polyval(strike_L,1:1:1024),'r-'); %#ok<NBRAK>
 plot_axes(handles, 'plot_emin_left', 'pixels', 'pixels', 'Slope', 'Right', 1, 1)
 ylim([min(peak_l)-1 max(peak_l)+1]);
-xlim([lpixl hpixl])
+xlim([lpixl hpixl]);
 % Plot spline fit resilte left
 
 axes(handles.plot_emin_right)
 plot([1:hpixr],peak_r,'bo',[1:1024],polyval(strike_R,1:1:1024),'r-'); %#ok<NBRAK>
 plot_axes(handles, 'plot_emin_right', 'pixels', 'pixels', 'Slope', 'Right', 1, 1)
 ylim([min(peak_r)-1 max(peak_r)+1]);
-xlim([lpixr hpixr])
+xlim([lpixr hpixr]);
 % Plot spline fit resilte right
 
 set(handles.radiobutton_auto_rotate,'Value',1);

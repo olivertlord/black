@@ -507,7 +507,7 @@ pushbutton_process_Callback([],[],handles)
 
 % --- PROCESS PUSHBUTTON --------------------------------------------------
 function pushbutton_process_Callback(~, ~, handles)
-
+tic;
 control_colors({1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1},handles)
 
 
@@ -614,6 +614,7 @@ for i = 1:length(filelist)
         Tcalc(handles, unkmat.path, folder, unkdata, calmat.cal_l, calmat.cal_r, hp, wavelengths, i, elapsedSec, filelist{i}, timestamp);
     end
 end
+toc;
 
 % --- CLEAR FIGURES BUTTON ------------------------------------------------
 

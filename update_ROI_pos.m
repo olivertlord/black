@@ -1,59 +1,29 @@
 function update_ROI_pos(ROI_pos)
-%--------------------------------------------------------------------------
-% UPDATE_ROI_POS
-%--------------------------------------------------------------------------
-% Version 6.0
-% Written and tested on Matlab R2014a (Windows 7) & R2017a (OS X 10.13)
+% Updates the ROI position values in the appropriate text boxes
+% based on the input ROI position. Determines left or right ROI
+% based on y-pixel threshold (127).
 
-% Copyright 2018 Oliver Lord, Mike Walter
-% email: oliver.lord@bristol.ac.uk
- 
-% This file is part of black.
- 
-% black is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
- 
-% black is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
- 
-% You should have received a copy of the GNU General Public License
-% along with black.  If not, see <http://www.gnu.org/licenses/>.
-%--------------------------------------------------------------------------
-%   DATA_PREP Applies user optional data cleaning procedures to the data
-%   before fitting. This function opens the raw data file, reads in the
-%   data, smooths it, removes saturated pixels, applies W emissivity values
-%   and normalises the image for plotting and then plots in axes10. It does
-%   not calibrate the data.
+handles = getappdata(0, 'handles');  % Retrieve handles structure from appdata
 
-%   INPUTS:
+% Determine if the ROI is on the left or right based on the y-coordinate
+isLeft = ROI_pos(2) > 127;
 
-%   OUTPUTS:
-
-
-%--------------------------------------------------------------------------
-
-handles = getappdata(0,'handles');
-% Get handles structure from appdata
-
-if ROI_pos(2) > 127
-    ROI_pos
-    set(handles.edit_ROI_min_left,'string',num2str(round(ROI_pos(2))))
-    set(handles.edit_ROI_max_left,'string',num2str(round(ROI_pos(2))+round(ROI_pos(4))))
-    
-    set(handles.edit_wavelength_min_left,'string',num2str(round(ROI_pos(1))))
-    set(handles.edit_wavelength_max_left,'string',num2str(round(ROI_pos(1))+round(ROI_pos(3))))
-else
-    b=1
-    set(handles.edit_ROI_min_right,'string',num2str(round(ROI_pos(2))))
-    set(handles.edit_ROI_max_right,'string',num2str(round(ROI_pos(2))+round(ROI_pos(4))))
-    
-    set(handles.edit_wavelength_min_right,'string',num2str(round(ROI_pos(1))))
-    set(handles.edit_wavelength_max_right,'string',num2str(round(ROI_pos(1))+round(ROI_pos(3))))
+% Select appropriate handle suffixes for left or right ROI
+side = 'left';
+if ~isLeft
+    side = 'right';
 end
-% Determines whether function has been called by the left or right ROI box
-% based on the x-pixel position (right nor left cannot extend beyond
-% 256/2). Updates values in text boxes based on ROI position.
+
+% Precompute rounded ROI position values
+yMin = round(ROI_pos(2));
+yMax = yMin + round(ROI_pos(4));
+xMin = round(ROI_pos(1));
+xMax = xMin + round(ROI_pos(3));
+
+% Update ROI min/max text boxes
+set(handles.(['edit_ROI_min_' side]), 'string', num2str(yMin));
+set(handles.(['edit_ROI_max_' side]), 'string', num2str(yMax));
+
+% Update wavelength min/max text boxes
+set(handles.(['edit_wavelength_min_' side]), 'string', num2str(xMin));
+set(handles.(['edit_wavelength_max_' side]), 'string', num2str(xMax));
