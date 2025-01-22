@@ -1,68 +1,60 @@
-function plot_axes(handles,plot_name, xlab, ylab, title_string, yloc, replace, auto, ylim1, ylim2, xlim1, xlim2)
-%--------------------------------------------------------------------------
-% PLOT_AXES
-%--------------------------------------------------------------------------
-% Version 6.0
-% Written and tested on Matlab R2014a (Windows 7) & R2017a (OS X 10.13)
+function plot_axes(handles, plot_name, xlab, ylab, title_string, yloc, replace, auto, ylim1, ylim2, xlim1, xlim2)
+% plot_axes configures axes with specified labels, title, and limits.
+%
+% Inputs:
+%   handles         - Structure of handles (used to select the axes)
+%   plot_name       - Name of the plot to modify (string)
+%   xlab            - Label for the x-axis (string)
+%   ylab            - Label for the y-axis (string)
+%   title_string    - Title for the plot (string)
+%   yloc            - Position of the y-axis ('left' or 'right')
+%   replace         - Boolean (1 to replace, 0 to add to existing plot)
+%   auto            - Boolean (1 for auto limits, 0 for manual limits)
+%   ylim1, ylim2    - Y-axis limits for manual adjustment (numeric)
+%   xlim1, xlim2    - X-axis limits for manual adjustment (numeric)
 
-% Copyright 2018 Oliver Lord, Mike Walter
-% email: oliver.lord@bristol.ac.uk
- 
-% This file is part of black.
- 
-% black is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 3 of the License, or
-% (at your option) any later version.
- 
-% black is distributed in the hope that it will be useful,
-% but WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-% GNU General Public License for more details.
- 
-% You should have received a copy of the GNU General Public License
-% along with black.  If not, see <http://www.gnu.org/licenses/>.
-%--------------------------------------------------------------------------
-%   DATA_PREP Applies user optional data cleaning procedures to the data
-%   before fitting. This function opens the raw data file, reads in the
-%   data, smooths it, removes saturated pixels, applies W emissivity values
-%   and normalises the image for plotting and then plots in axes10. It does
-%   not calibrate the data.
+% Ensure plot_name exists in handles
+if ~isfield(handles, plot_name)
+    error('Plot name "%s" not found in handles.', plot_name);
+end
 
-%   INPUTS:
+% Select the axes for plotting
+axes(handles.(plot_name));
 
-%   OUTPUTS:
-
-
-%--------------------------------------------------------------------------
-axes(handles.(plot_name))
+% Set axis labels with specified font size
 xlabel(xlab, 'FontSize', 12);
 ylabel(ylab, 'FontSize', 12);
 
-if strfind(title_string,'Wien') == 1
-    ax=gca;
-    yticklabels = get(ax, 'YTickLabel');
-    yticklabels{1} = ' ';
-    set(ax, 'YTickLabel',yticklabels);
-end
-    
-set(gca,'YAxisLocation',yloc)
-if replace == 1
-    set(gca,'NextPlot','replacechildren') ;
-else
-    set(gca,'NextPlot','Add') ;
+% Special handling for titles containing "Wien"
+if startsWith(title_string, 'Wien', 'IgnoreCase', true)
+    ax = gca;
+    yticklabels = get(ax, 'YTickLabel');  % Get the current y-tick labels
+    yticklabels{1} = '';  % Remove the first y-tick label
+    set(ax, 'YTickLabel', yticklabels);  % Apply the modified y-tick labels
+    set(ax, 'XTickLabel', []);  % Remove all x-tick labels
 end
 
-% Sets auto limits if required
+% Set the position of the y-axis (left or right)
+set(gca, 'YAxisLocation', yloc);
+
+% Set the 'NextPlot' property (replace or add)
+if replace == 1
+    set(gca, 'NextPlot', 'replacechildren');
+else
+    set(gca, 'NextPlot', 'add');
+end
+
+% Set axis limits (either auto or manual)
 if auto == 1
-    ylim('auto')
-    xlim('auto')
-elseif auto == 0
+    ylim('auto');
+    xlim('auto');
+else
     ylim([ylim1 ylim2]);
     xlim([xlim1 xlim2]);
 end
 
-if strcmp(title_string,'Cross-sections') == 0 && strcmp(title_string,'Wien fits') == 0
+% Only add title if not "Cross-sections" or "Wien fits"
+if ~ismember(title_string, {'Cross-sections', 'Wien fits'})
     title(title_string, 'FontSize', 14);
 end
-%--------------------------------------------------------------------------
+end
