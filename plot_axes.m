@@ -42,7 +42,7 @@ ylabel(ylab, 'FontSize', 12);
 if strfind(title_string,'Wien') == 1
     ax=gca;
     yticklabels = get(ax, 'YTickLabel');
-    yticklabels(1) = ' ';
+    yticklabels{1} = ' ';
     set(ax, 'YTickLabel',yticklabels);
 end
     

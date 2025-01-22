@@ -202,7 +202,7 @@ function edit_wavelength_min_left_Callback(~, ~, handles) %#ok<*DEFNU>
 
 % Load previous file path from .MAT file
 unkmat = matfile('unknown.mat','Writable',true);
-unkmat.wavelengths
+
 % Prevent user going beyond range
 if eval(get(handles.edit_wavelength_min_left,'string')) < unkmat.wavelengths(1,1)
     set(handles.edit_wavelength_min_left,'string',num2str(round(unkmat.wavelengths(1,1))));
