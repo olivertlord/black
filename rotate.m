@@ -1,12 +1,33 @@
 function rotate(handles)
+% ROTATE Computes tilt angles of the left and right regions and updates plots.
+%
+% This function calculates the tilt angles of the left and right regions of an image
+% using spline interpolation and linear fitting. The computed angles are saved in 
+% 'rotfile.mat' for later use.
+%
+% Inputs:
+%   handles - Structure containing GUI handles for accessing plot elements.
+%
+% Functionality:
+% - Extracts ROI (Region of Interest) boundaries from GUI fields.
+% - Loads calibration, hardware parameters, and unknown data from .MAT files.
+% - Removes saturated pixels from the image.
+% - Performs spline interpolation on left and right ROI pixel columns.
+% - Identifies peak intensity positions for both regions.
+% - Fits a linear regression to the extracted peaks.
+% - Computes tilt angles using the arctangent of the fitted slopes.
+% - Saves computed tilt angles to a .MAT file.
+% - Updates GUI plots with detected peak positions and fitted slopes.
+%
+% Output:
+% - Saves computed tilt angles ('tilt_L', 'tilt_R') to 'rotfile.mat'.
+% - Updates the plots in the GUI for visualization.
 
-[~, ~, ~, ~, mnrowl, mxrowl, mnrowr, mxrowr] = ROI(handles);
 % Get GUI box values
+[~, ~, ~, ~, mnrowl, mxrowl, mnrowr, mxrowr] = ROI(handles);
 
 % Load MAT files
-calmat = matfile('calibration.mat', 'Writable', true);
 unkmat = matfile('unknown.mat', 'Writable', true);
-hp = matfile('hardware_parameters.mat', 'Writable', true);
 
 % Get current filename and data
 unkdata = unkmat.unk;
@@ -56,23 +77,13 @@ save('rotfile.mat', 'tilt_L', 'tilt_R');
 % Plot left ROI results
 axes(handles.plot_emin_left);
 plot(lpixl:hpixl, peak_l(lpixl:hpixl), 'bo', 1:1024, polyval(strike_L, 1:1024), 'r-');
-plot_axes(handles, 'plot_emin_left', 'pixels', 'pixels', 'Slope', 'Right', 1, 1);
+update_axes(handles.plot_emin_left, 'pixels', '', 'Slope', 'Right', 1, 1);
 ylim([min(peak_l) - 1, max(peak_l) + 1]);
 xlim([lpixl, hpixl]);
 
 % Plot right ROI results
 axes(handles.plot_emin_right);
 plot(lpixr:hpixr, peak_r(lpixr:hpixr), 'bo', 1:1024, polyval(strike_R, 1:1024), 'r-');
-plot_axes(handles, 'plot_emin_right', 'pixels', 'pixels', 'Slope', 'Right', 1, 1);
+update_axes(handles.plot_emin_right, 'pixels', 'pixels', 'Slope', 'Right', 1, 1);
 ylim([min(peak_r) - 1, max(peak_r) + 1]);
 xlim([lpixr, hpixr]);
-
-% Set "rotate" radiobutton to on
-set(handles.radiobutton_auto_rotate, 'Value', 1);
-
-% Pause to allow user to see results
-pause(2);
-
-% Run Tcalc with required parameters
-Tcalc(handles, unkdata, calmat.cal_l, calmat.cal_r, hp, unkmat.wavelengths, 1);
-end
