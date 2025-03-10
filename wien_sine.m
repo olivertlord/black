@@ -11,27 +11,24 @@ function [T, sigT, E, sigE, SSD, y_fit] = wien_sine(wavelengths, intensities)
 %   E    - Estimated emissivity
 %   sigE - Uncertainty in emissivity
 
-% Define model for fitting
-wien_sine_model = @(b,x)(b(1) + b(2)*x + b(3)*sin(2*pi*(x-b(4))/b(5)));
 
-% Initial guess parameters
-beta0 = [79.5 -.0008 .3 1600 1200];
+% First do a standard Wien fit
+[~, ~, ~, ~, ~, y_fit] = wien(wavelengths, intensities);
 
-% Perform nonlinear least squares fitting
-[x_fit, resids, J] = nlinfit(wavelengths, intensities, wien_sine_model, beta0);
+% Determine the residuals
+residuals = intensities(:) - y_fit(:);
 
-% Extract fitted parameters
-E = x_fit(1);  % Emissivity
-T = x_fit(2);  % Temperature (K)
+% Smooth the residuals
+residuals_smoothed = sgolayfilt(double(residuals), 3, 51);
 
-% Compute confidence intervals for uncertainties
-ci = nlparci(x_fit, resids, J);
-sigE = (ci(1,2) - ci(1,1)) / 2;  % Uncertainty in emissivity
-sigT = (ci(2,2) - ci(2,1)) / 2;  % Uncertainty in temperature
+% Remove the low frequency noise from the data
+intensities = intensities - residuals_smoothed;
 
-% Determine average mismatch
-SSD=norm(resids,2)^2;
+% Repeat the Wien fit
+[T, sigT, E, sigE, SSD, y_fit] = wien(wavelengths, intensities);
 
-% Compute fitted intensities using optimized parameters
-y_fit = planck_model(x_fit, wavelengths_m);
+y_fit = y_fit + residuals_smoothed';
+
+%y_fit = y_fit + residuals_smoothed
+
 end

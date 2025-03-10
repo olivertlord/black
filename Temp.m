@@ -96,7 +96,7 @@ elseif get(handles.popupmenu_fit_type,'Value') == 2
     
     for i=1:numRows
         
-        [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = wien(x(start_column:end_column)',sr_sample(start_column:end_column,i));
+        [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = wien_sine(x(start_column:end_column)',sr_sample(start_column:end_column,i));
 
     end
 

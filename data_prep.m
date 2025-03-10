@@ -93,6 +93,11 @@ if get(handles.radiobutton_W_emissivity, 'value')
     unkdata = bsxfun(@rdivide, unkdata, E(:));
 end
 
+% Flip image if radiobutton enabled
+if get(handles.radiobutton_flip_image, 'value')
+    unkdata = fliplr(unkdata);
+end
+
 % Check if data is empty after desaturation
 skip = isnan(max(unkdata(:)));
 

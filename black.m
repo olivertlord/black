@@ -145,6 +145,9 @@ end
 % Draw ROIs on raw image
 ROI(handles);
 
+% FLIP IMAGE RADIOBUTTON ------------------------------------------------------------------------------------------------------
+function radiobutton_flip_image_Callback(~, ~, ~)
+
 % INCREMENT PUSHBUTTON ------------------------------------------------------------------------------------------------------
 function pushbutton_increment_Callback(~, ~, handles)
 % Load filenames from .MAT file
