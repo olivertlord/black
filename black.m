@@ -91,10 +91,10 @@ function edit_wavelength_max_left_Callback(hObject, eventdata, handles)
     edit_box_callback(hObject, eventdata, handles, 1, 'end', true);
 
 function edit_ROI_min_left_Callback(hObject, eventdata, handles)
-    edit_box_callback(hObject, eventdata, handles, 128, 256, false);
+    edit_box_callback(hObject, eventdata, handles, 1, 128, false);
 
 function edit_ROI_max_left_Callback(hObject, eventdata, handles)
-    edit_box_callback(hObject, eventdata, handles, 128, 256, false);
+    edit_box_callback(hObject, eventdata, handles, 1, 128, false);
 
 function edit_wavelength_min_right_Callback(hObject, eventdata, handles)
     edit_box_callback(hObject, eventdata, handles, 1, 'end', true);
@@ -103,10 +103,10 @@ function edit_wavelength_max_right_Callback(hObject, eventdata, handles)
     edit_box_callback(hObject, eventdata, handles, 1, 'end', true);
 
 function edit_ROI_min_right_Callback(hObject, eventdata, handles)
-    edit_box_callback(hObject, eventdata, handles, 1, 128, false);
+    edit_box_callback(hObject, eventdata, handles, 128, 256, false);
 
 function edit_ROI_max_right_Callback(hObject, eventdata, handles)
-    edit_box_callback(hObject, eventdata, handles, 1, 128, false);
+    edit_box_callback(hObject, eventdata, handles, 128, 256, false);
 
 % UPDATE CALIBRATION FILE PUSHBUTTON ----------------------------------------------------------------------------------------
 function pushbutton_update_calibration_files_Callback(~, ~, handles)

@@ -60,7 +60,6 @@ end
 % Convert Pixels to Microns
 hp = matfile('hardware_parameters.mat','Writable',true);
 resolution = hp.pixel_width / hp.magnification;
-size(T_left)
 
 num_pixels = length(T_left); % Get the number of pixels
 half_length = (num_pixels - 1) / 2; % Centered range
@@ -70,7 +69,6 @@ num_pixels = length(T_right); % Get the number of pixels
 half_length = (num_pixels - 1) / 2; % Centered range
 microns_r = (-half_length:half_length) * resolution;
 
-size(microns_l)
 % Helper function to calculate temperature stats
 function [max_temp, max_err, min_temp, min_err, mean_temp, mean_err] = calc_temp_stats(T, e, num_rows)
     [max_temp, idx] = max(T);

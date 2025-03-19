@@ -62,8 +62,8 @@ addlistener(ROI_l, 'MovingROI', @(src, evt) update_ROI_pos(src.Position, handles
 addlistener(ROI_r, 'MovingROI', @(src, evt) update_ROI_pos(src.Position, handles));
 
 % Set position constraints for ROIs
-ROI_l.DrawingArea = [wavelengths(1), 128, wavelengths(end) - wavelengths(1), 256 - 128];
-ROI_r.DrawingArea = [wavelengths(1), 1, wavelengths(end) - wavelengths(1), 127 - 1];
+ROI_r.DrawingArea = [wavelengths(1), 128, wavelengths(end) - wavelengths(1), 256 - 128];
+ROI_l.DrawingArea = [wavelengths(1), 1, wavelengths(end) - wavelengths(1), 127 - 1];
 
 end
 
@@ -85,7 +85,7 @@ function update_ROI_pos(ROI_pos, handles)
 % - Updates the corresponding text boxes for min/max wavelength and pixel positions.
 
 % Determine if the ROI is on the left or right based on the y-coordinate
-isLeft = ROI_pos(2) > 127;
+isLeft = ROI_pos(2) < 128;
 
 % Select appropriate handle suffixes for left or right ROI
 side = 'left';
