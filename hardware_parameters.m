@@ -53,6 +53,8 @@ function edit4_CreateFcn(~, ~, ~)
 function edit5_CreateFcn(~, ~, ~)
 function edit6_CreateFcn(~, ~, ~)
 function edit7_CreateFcn(~, ~, ~)
+function edit8_CreateFcn(~, ~, ~)
+function edit9_CreateFcn(~, ~, ~)
 
 % OPENING FUNCTION ----------------------------------------------------------------------------------------------------------
 function hardware_parameters_OpeningFcn(hObject, ~, handles, varargin)
@@ -61,10 +63,11 @@ guidata(hObject, handles);
 
 % Load current hardware_parameters
 m = matfile('hardware_parameters.mat', 'Writable', true);
-fields = {'conp', 'pix1', 'pix2', 'conl', 'lam1', 'lam2', 'row', 'col'};
+fields = {'conp', 'pix1', 'pix2', 'conl', 'lam1', 'lam2', 'row', 'col', 'pixel_width', 'magnification'};
 editHandles = [handles.edit3, handles.edit4, handles.edit5, ...
                handles.edit0, handles.edit1, handles.edit2, ...
-               handles.edit6, handles.edit7];
+               handles.edit6, handles.edit7, handles.edit8, ...
+               handles.edit9];
 for i = 1:numel(fields)
     set(editHandles(i), 'String', num2str(m.(fields{i})));
 end
@@ -98,13 +101,20 @@ check_numeric(hObject);
 function edit7_Callback(hObject, ~, ~)
 check_numeric(hObject);
 
+function edit8_Callback(hObject, ~, ~)
+check_numeric(hObject);
+
+function edit9_Callback(hObject, ~, ~)
+check_numeric(hObject);
+
 % PUSHBUTTON SAVE -----------------------------------------------------------------------------------------------------------
 function pushbutton1_Callback(~, ~, handles)
 m = matfile('hardware_parameters.mat', 'Writable', true);
-fields = {'conp', 'pix1', 'pix2', 'conl', 'lam1', 'lam2', 'row', 'col'};
+fields = {'conp', 'pix1', 'pix2', 'conl', 'lam1', 'lam2', 'row', 'col', 'pixel_width', 'magnification'};
 editHandles = [handles.edit3, handles.edit4, handles.edit5, ...
                handles.edit0, handles.edit1, handles.edit2, ...
-               handles.edit6, handles.edit7];
+               handles.edit6, handles.edit7, handles.edit8, ...
+               handles.edit9];
 for i = 1:numel(fields)
     m.(fields{i}) = str2double(get(editHandles(i), 'String'));
 end
