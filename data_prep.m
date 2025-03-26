@@ -72,6 +72,13 @@ if get(handles.radiobutton_subtract_background, 'value')
     
     % Apply thresholding
     backgroundData(backgroundData > 64000) = NaN; 
+
+    % Scale background
+    backgroundData(1,256)
+    unkdata(1,256)
+    background_scaling = unkdata(1,256) / backgroundData(1,256)
+    backgroundData = backgroundData .* background_scaling;
+    backgroundData(1,256)
     
     % Save modified data back to the .mat file
     bakmat.background = backgroundData;
@@ -82,6 +89,8 @@ if get(handles.radiobutton_subtract_background, 'value')
     end
 
     unkdata = unkdata - bakmat.background;
+
+    unkdata(1,256)
 
 end
 
