@@ -119,4 +119,14 @@ if get(handles.radiobutton_T_correction,'Value') == 1
         T(i)=T(i) - (-0.0216*(sigT(i)*sigT(i))+17.882*sigT(i)); 
     end
 end
+
+% Apply error trimming
+error_range = max(sigT) - min(sigT);
+error_cutoff = ((1 - get(handles.slider_error_trim,'Value')) * error_range) + min(sigT);
+
+sigT(sigT > error_cutoff) = NaN;
+T(isnan(sigT)) = NaN;
+E(isnan(sigT)) = NaN;
+sigE(isnan(sigT)) = NaN;
+
 end

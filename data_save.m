@@ -76,9 +76,10 @@ end
 write_summary_data(summary_file, filename, timestamp, elapsedSec, ...
     maxtempl, emaxl, mintempl, eminl, meantempl, emeanl, ...
     maxtempr, emaxr, mintempr, eminr, meantempr, emeanr);
+
 end
 
-% Helper function to write the summary file header
+% HELPER FUNCTION: WRITE_SUMMARY_HEADER--------------------------------------------------------------------------------------
 function write_summary_header(summary_file)
 fid = fopen(summary_file, 'a');
 if fid == -1
@@ -91,6 +92,7 @@ header = sprintf('%-20s%-15s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-
                       'E Min L', 'Mean L', 'E Mean L', 'Max R', 'E Max R', ...
                       'Min R', 'E Min R', 'Mean R', 'E Mean R');
 fprintf(fid, header);
+fprintf('\n');
 fprintf(header);
 fclose(fid);
 end

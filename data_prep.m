@@ -69,16 +69,14 @@ if get(handles.radiobutton_subtract_background, 'value')
     % Load background data into memory
     bakmat = matfile('background.mat', 'Writable', true);
     backgroundData = bakmat.background; % Load the variable
-    
+
     % Apply thresholding
     backgroundData(backgroundData > 64000) = NaN; 
+    backgroundData(backgroundData < -1000) = NaN; 
 
     % Scale background
-    backgroundData(1,256)
-    unkdata(1,256)
-    background_scaling = unkdata(1,256) / backgroundData(1,256)
+    background_scaling = mean(unkdata(1:9,247:256),'all') / mean(backgroundData(1:9,247:256),'all');
     backgroundData = backgroundData .* background_scaling;
-    backgroundData(1,256)
     
     % Save modified data back to the .mat file
     bakmat.background = backgroundData;
@@ -89,9 +87,6 @@ if get(handles.radiobutton_subtract_background, 'value')
     end
 
     unkdata = unkdata - bakmat.background;
-
-    unkdata(1,256)
-
 end
 
 % Apply W emissivity correction if radiobutton is enabled
@@ -115,12 +110,13 @@ smooth = ceil(get(handles.slider_smooth, 'Value'));
 unkdata = conv2(unkdata, ones(smooth, 1), 'same');
 set(handles.text_smooth, 'String', num2str(smooth));
 
-% Compute color limits safely
+% Compute color limits safelyl
 maxVal = max(unkdata(:));
+minVal = min(unkdata(:));
 if maxVal == 0 || isnan(maxVal) % Prevents invalid CLim range
     clim = [0 1]; % Default safe range
 else
-    clim = [0 maxVal];
+    clim = [minVal maxVal];
 end
 
 % Plot raw image
@@ -128,6 +124,6 @@ update_axes(handles.plot_raw, 'wavelength (nm)', 'pixels', ...
     sprintf('IMAGE: %s', filename), 'Right', 1, 0, 1, ...
     size(unkdata, 2), wavelengths(1), wavelengths(end));
 
-% Use the safe color range
+% Plot image with forced CLim update
 imagesc(handles.plot_raw, wavelengths, 1:256, unkdata(1:1024, 1:256)', clim);
 end

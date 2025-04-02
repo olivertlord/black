@@ -35,6 +35,7 @@ function edit_file_min_CreateFcn(~, ~, ~)
 function popupmenu_fit_type_CreateFcn(~, ~, ~)
 function popupmenu_error_min_type_CreateFcn(~, ~, ~)
 function edit_Background_File_CreateFcn(~, ~, ~)
+function slider_error_trim_CreateFcn(~, ~, ~)
 
 % OPENING FUNCTION ----------------------------------------------------------------------------------------------------------
 function black_OpeningFcn(hObject, ~, handles, varargin)
@@ -227,10 +228,13 @@ function popupmenu_error_min_type_Callback(~, ~,~)
 
 % SLIDER SMOOTHING ----------------------------------------------------------------------------------------------------------
 function slider_smooth_Callback(~, ~, handles)
-
-% Update text box when slider is changed
 smooth = ceil(get(handles.slider_smooth,'Value'));
 set(handles.text_smooth,'String',num2str(smooth));
+
+% SLIDER SMOOTHING ----------------------------------------------------------------------------------------------------------
+function slider_error_trim_Callback(~, ~, handles)
+error_trim = get(handles.slider_error_trim,'Value');
+set(handles.text_error_trim, 'String', sprintf('%.2f', error_trim));
 
 % RADIOBUTTON AUTO ROTATE ---------------------------------------------------------------------------------------------------
 function radiobutton_auto_rotate_Callback(~, ~, ~)
@@ -394,6 +398,11 @@ if isempty(timeStart) && get(handles.radiobutton_save_output,'Value') == 1
         strcat(unkmat.path,folder,'/calibration.mat'));
     copyfile(strcat(pwd,'/hardware_parameters.mat'),...
         strcat(unkmat.path,folder,'/hardware_parameters.mat'));
+    
+    if get(handles.radiobutton_subtract_background,'Value') == 1
+        copyfile(strcat(pwd,'/background.mat'),...
+        strcat(unkmat.path,folder,'/background.mat'));
+    end
 end
 
 % Initialize summed data if needed
@@ -484,6 +493,11 @@ if namesLen > 1
     end
 elseif namesLen == 1 && queueLen == 1
     update_button_states(defaultState, handles);
+end
+
+% Calculate experiment statistics once post-processing is complete
+if get(handles.pushbutton_live,'Value') == 0 && get(handles.radiobutton_save_output,'Value') == 1
+    experiment_stats(fullfile(unkmat.path, folder, 'SUMMARY.txt'));
 end
 
 % PUSHBUTTON ROTATE ---------------------------------------------------------------------------------------------------------

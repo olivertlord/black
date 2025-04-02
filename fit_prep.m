@@ -69,19 +69,9 @@ num_pixels = length(T_right); % Get the number of pixels
 half_length = (num_pixels - 1) / 2; % Centered range
 microns_r = (-half_length:half_length) * resolution;
 
-% Helper function to calculate temperature stats
-function [max_temp, max_err, min_temp, min_err, mean_temp, mean_err] = calc_temp_stats(T, e, num_rows)
-    [max_temp, idx] = max(T);
-    max_err = e(idx);
-    [min_temp, idx] = min(T);
-    min_err = e(idx);
-    mean_temp = mean(T, 'omitnan');
-    mean_err = (std(T, 'omitnan') / sqrt(num_rows)) + mean(e, 'omitnan');
-end
-
 % Calculate stats
-[maxtempl, emaxl, mintempl, eminl, meantempl, emeanl] = calc_temp_stats(T_left, sigT_left, mxrowl - mnrowl);
-[maxtempr, emaxr, mintempr, eminr, meantempr, emeanr] = calc_temp_stats(T_right, sigT_right, mxrowr - mnrowr);
+[maxtempl, emaxl, mintempl, eminl, meantempl, emeanl] = calc_temp_stats(T_left, sigT_left);
+[maxtempr, emaxr, mintempr, eminr, meantempr, emeanr] = calc_temp_stats(T_right, sigT_right);
 
 % Update plots
 data_plot(handles, x_fit, y_fit_left, y_fit_right, sr_sample_left, sr_sample_right, idxl, idxr, start_pixel_left, end_pixel_left, start_pixel_right, end_pixel_right, ...

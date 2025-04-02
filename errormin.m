@@ -1,5 +1,5 @@
 function errormin(errorMinType, handles, unkl, unkr, caldata_l, caldata_r, hp, wavelengths, mnll, mxll, mnlr, mxlr,...
-    mnrowl, mxrowl, mnrowr, mxrowr, nw, c1)
+    mnrowl, mxrowl, mnrowr, mxrowr)
 % ERRORMIN Performs error minimization for spectral fitting and calibration optimization.
 %
 %   This function calculates temperature and error values for different wavelength
@@ -38,7 +38,7 @@ if errorMinType < 4
     % Remove negative errors
     ael(ael <= 0) = NaN;
     aer(aer <= 0) = NaN;
-
+    
     % Find minimum error indices
     [~, idxl] = min(ael(:));
     [~, idxr] = min(aer(:));
@@ -181,11 +181,11 @@ if errorMinType == 2
     update_axes(handles.plot_emin_right, 'Start Wavelength (nm)', 'Average Error (K)', 'Error Min Right', 'Right', 1, 1);
 
 elseif errorMinType == 3
-    imagesc(handles.plot_emin_left, sw, ww, 1 ./ ael);
-    update_axes(handles.plot_emin_left, 'Start Wavelength (nm)', 'Window Width (nm)', 'Error Min Left', 'Right', 1, 0, ww(1), ww(end), sw(1), sw(end));
+    imagesc(handles.plot_emin_left, ww, sw, 1 ./ ael);
+    update_axes(handles.plot_emin_left, 'Start Wavelength (nm)', '', 'Error Min Left', 'Right', 1, 0, sw(1), sw(end), ww(1), ww(end));
 
-    imagesc(handles.plot_emin_right, sw, ww, 1 ./ aer);
-    update_axes(handles.plot_emin_right, 'Start Wavelength (nm)', 'Window Width (nm)', 'Error Min Right', 'Right', 1, 0, ww(1), ww(end), sw(1), sw(end));
+    imagesc(handles.plot_emin_right, ww, sw, 1 ./ aer);
+    update_axes(handles.plot_emin_right, 'Start Wavelength (nm)', 'Window Width (nm)', 'Error Min Right', 'Right', 1, 0, sw(1), sw(end), ww(1), ww(end));
 end
 end
 
