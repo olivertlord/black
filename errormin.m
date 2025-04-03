@@ -1,4 +1,4 @@
-function errormin(errorMinType, handles, unkl, unkr, caldata_l, caldata_r, hp, wavelengths, mnll, mxll, mnlr, mxlr,...
+function [mnll,mxll,mnlr,mxlr] = errormin(errorMinType, handles, unkl, unkr, caldata_l, caldata_r, hp, wavelengths, mnll, mxll, mnlr, mxlr,...
     mnrowl, mxrowl, mnrowr, mxrowr)
 % ERRORMIN Performs error minimization for spectral fitting and calibration optimization.
 %
@@ -43,8 +43,17 @@ if errorMinType < 4
     [~, idxl] = min(ael(:));
     [~, idxr] = min(aer(:));
 
-    % Update GUI fields
-    updateGUIFields(handles, spix, epix, idxl, idxr, wavelengths);
+    % Determine optimum wavelength limits
+    mnll = round(wavelengths(spix(idxl)));
+    mxll = round(wavelengths(epix(idxl)));
+    mnlr = round(wavelengths(spix(idxr)));
+    mxlr = round(wavelengths(epix(idxr)));
+    
+    % Set GUI boxes
+    set(handles.edit_wavelength_min_left, 'string', mnll);
+    set(handles.edit_wavelength_max_left, 'string', mxll);
+    set(handles.edit_wavelength_min_right, 'string', mnlr);
+    set(handles.edit_wavelength_max_right, 'string', mxlr);
 
     % Plot error minimisation data
     plotErrorMinimisationData(handles, wavelengths, errorMinType, spix, sw, ww, ael, aer);
@@ -116,8 +125,8 @@ end
 % HELPER FUNCTION: generatePixelData ----------------------------------------------------------------------------------------
 function [spix, epix, sw, ww] = generatePixelData(errorMinType, wavelengths)
 maxpix = 1024;
-lsteps = 45;
-min_step = 20;
+lsteps = 25;
+min_step = 36;
 min_width = 124;
 
 if errorMinType == 2
@@ -161,14 +170,6 @@ for i = 1:size(spix, 1)
         end
     end
 end
-end
-
-% HELPER FUNCTION: updateGUIfields ------------------------------------------------------------------------------------------
-function updateGUIFields(handles, spix, epix, idxl, idxr, wavelengths)
-set(handles.edit_wavelength_min_left, 'string', round(wavelengths(spix(idxl))));
-set(handles.edit_wavelength_max_left, 'string', round(wavelengths(epix(idxl))));
-set(handles.edit_wavelength_min_right, 'string', round(wavelengths(spix(idxr))));
-set(handles.edit_wavelength_max_right, 'string', round(wavelengths(epix(idxr))));
 end
 
 % HELPER FUNCTION: plotErrorMinimisationData --------------------------------------------------------------------------------

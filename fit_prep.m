@@ -43,11 +43,11 @@ end
 % Run error minimisation if selected
 errorMinType = get(handles.popupmenu_error_min_type, 'Value');
 if errorMinType > 1
-    errormin(errorMinType,handles,unkl,unkr,caldata_l,caldata_r,hp,wavelengths,mnll,mxll,mnlr,mxlr,mnrowl,mxrowl,mnrowr,mxrowr)
+    [mnll,mxll,mnlr, mxlr] = errormin(errorMinType,handles,unkl,unkr,caldata_l,caldata_r,hp,wavelengths,mnll,mxll,mnlr,mxlr,mnrowl,mxrowl,mnrowr,mxrowr);
 end
 
 % Calculate temperature Left and Right
-[T_left,sigT_left,E_left,sigE_left,sr_sample_left,SSD_left,y_fit_left,x_fit,start_pixel_left,end_pixel_left] = Temp(unkl,caldata_l,hp.sr,...
+[T_left,sigT_left,E_left,sigE_left,sr_sample_left,SSD_left,y_fit_left,~,start_pixel_left,end_pixel_left] = Temp(unkl,caldata_l,hp.sr,...
     wavelengths,mnll,mxll,mxrowl,mnrowl,handles);
 
 [T_right,sigT_right,E_right,sigE_right,sr_sample_right,SSD_right,y_fit_right,x_fit,start_pixel_right,end_pixel_right] = Temp(unkr,caldata_r,hp.sr,...
