@@ -43,7 +43,7 @@ end
 % Run error minimisation if selected
 errorMinType = get(handles.popupmenu_error_min_type, 'Value');
 if errorMinType > 1
-    [mnll,mxll,mnlr, mxlr] = errormin(errorMinType,handles,unkl,unkr,caldata_l,caldata_r,hp,wavelengths,mnll,mxll,mnlr,mxlr,mnrowl,mxrowl,mnrowr,mxrowr);
+    [mnll,mxll,mnlr,mxlr] = errormin(errorMinType,handles,unkl,unkr,caldata_l,caldata_r,hp,wavelengths,mnll,mxll,mnlr,mxlr,mnrowl,mxrowl,mnrowr,mxrowr);
 end
 
 % Calculate temperature Left and Right

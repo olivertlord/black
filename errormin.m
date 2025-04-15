@@ -86,7 +86,7 @@ if errorMinType == 4
     % Find the maximum length to loop over
     maxLength = max(numLeft, numRight);
 
-    [aTl,aTr,ael,aer] = deal(NaN(1,maxLength));
+    [max_el,max_er] = deal(NaN(1,maxLength));
     
     % Loop through the longest array
     for i = 1:maxLength
@@ -103,16 +103,16 @@ if errorMinType == 4
         % Fit temperature
         [Tl, el] = Temp(unkl, calmat.cal_l, hp.sr, wavelengths, mnll, mxll, mxrowl, mnrowl, handles);
         [Tr, er] = Temp(unkr, calmat.cal_r, hp.sr, wavelengths, mnlr, mxlr, mxrowr, mnrowr, handles);
-
-        aTl(i) = mean(Tl, 'omitnan');
-        aTr(i) = mean(Tr, 'omitnan');
-        ael(i) = mean(el, 'omitnan');
-        aer(i) = mean(er, 'omitnan');
+        
+        % get error in maximum T
+        [~, max_el(i), ~, ~, ~, ~] = calc_temp_stats(Tl, el);
+        [~, max_er(i), ~, ~, ~, ~] = calc_temp_stats(Tr, er);
     end
     
     % Find minimum error indices
-    [~, idxl] = min(ael(:));
-    [~, idxr] = min(aer(:));
+
+    [~, idxl] = min(max_el)
+    [~, idxr] = min(max_er)
 
     % Update GUI and calmat
     data_load('calibration.mat', 'name_l', 'path', 'cal_l', 'wavelengths', '', handles.edit_calname_left, 'on',...
