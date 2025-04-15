@@ -111,8 +111,8 @@ if errorMinType == 4
     
     % Find minimum error indices
 
-    [~, idxl] = min(max_el)
-    [~, idxr] = min(max_er)
+    [~, idxl] = min(max_el);
+    [~, idxr] = min(max_er);
 
     % Update GUI and calmat
     data_load('calibration.mat', 'name_l', 'path', 'cal_l', 'wavelengths', '', handles.edit_calname_left, 'on',...

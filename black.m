@@ -36,6 +36,7 @@ function popupmenu_fit_type_CreateFcn(~, ~, ~)
 function popupmenu_error_min_type_CreateFcn(~, ~, ~)
 function edit_Background_File_CreateFcn(~, ~, ~)
 function slider_error_trim_CreateFcn(~, ~, ~)
+function slider_sn_trim_CreateFcn(~, ~, ~)
 
 % OPENING FUNCTION ----------------------------------------------------------------------------------------------------------
 function black_OpeningFcn(hObject, ~, handles, varargin)
@@ -231,10 +232,15 @@ function slider_smooth_Callback(~, ~, handles)
 smooth = ceil(get(handles.slider_smooth,'Value'));
 set(handles.text_smooth,'String',num2str(smooth));
 
-% SLIDER SMOOTHING ----------------------------------------------------------------------------------------------------------
+% SLIDER ERROR TRIM ---------------------------------------------------------------------------------------------------------
 function slider_error_trim_Callback(~, ~, handles)
 error_trim = get(handles.slider_error_trim,'Value');
 set(handles.text_error_trim, 'String', sprintf('%.2f', error_trim));
+
+% SLIDER S/N TRIM -----------------------------------------------------------------------------------------------------------
+function slider_sn_trim_Callback(~, ~, handles)
+sn_trim = get(handles.slider_sn_trim,'Value');
+set(handles.text_sn_trim, 'String', sprintf('%.2f', sn_trim));
 
 % RADIOBUTTON AUTO ROTATE ---------------------------------------------------------------------------------------------------
 function radiobutton_auto_rotate_Callback(~, ~, ~)

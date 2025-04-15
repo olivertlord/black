@@ -76,6 +76,9 @@ if get(handles.radiobutton_subtract_background, 'value')
 
     % Scale background
     background_scaling = mean(unkdata(1:9,247:256),'all') / mean(backgroundData(1:9,247:256),'all');
+    if background_scaling == 0 || isnan(background_scaling)
+        background_scaling = 1e-6;  
+    end
     backgroundData = backgroundData .* background_scaling;
     
     % Save modified data back to the .mat file
@@ -85,7 +88,6 @@ if get(handles.radiobutton_subtract_background, 'value')
         binned = bakmat.background(:, 1);
         bakmat.background = padarray(binned, [0, 255], 'replicate', 'post');
     end
-
     unkdata = unkdata - bakmat.background;
 end
 

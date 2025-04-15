@@ -66,6 +66,16 @@ numRows = size(sr_sample, 2);
 [T, sigT, E, sigE, SSD] = deal(zeros(1, numRows));
 y_fit = zeros(length(start_column:end_column), numRows);
 
+% Apply S/N trimming
+sn_range = max(sr_sample(:)) - min(sr_sample(:));
+sn_cutoff = (get(handles.slider_sn_trim,'Value') * sn_range) + min(sr_sample(:));
+for r = mnrow:mxrow
+    row_data = sr_sample(:, r - mnrow + 1);
+    if max(row_data) < sn_cutoff
+        sr_sample(:, r - mnrow + 1) = NaN;
+    end
+end
+
 % If Wien fit is selected from drop-down menu
 if get(handles.popupmenu_fit_type,'Value') == 1
 
@@ -77,10 +87,13 @@ if get(handles.popupmenu_fit_type,'Value') == 1
     sr_sample=real(sr_sample);
     sr_sample(sr_sample==-Inf)=NaN;
 
-    for i=1:numRows
-
-        [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = wien(x(start_column:end_column)',sr_sample(start_column:end_column,i));
-        
+    for i = 1:numRows
+        % Check for sufficient non-NaN values
+        if sum(~isnan(sr_sample(start_column:end_column, i))) > 1
+            [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:, i)] = wien(x(start_column:end_column)', sr_sample(start_column:end_column, i));
+        else
+            [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:, i)] = deal(NaN);
+        end
     end
     
 % If Wien + Sine is selected from the drop-down menu
@@ -95,25 +108,27 @@ elseif get(handles.popupmenu_fit_type,'Value') == 2
     sr_sample(sr_sample==-Inf)=NaN;
     
     for i=1:numRows
-        
-        [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = wien_sine(x(start_column:end_column)',sr_sample(start_column:end_column,i));
-
+        if sum(~isnan(sr_sample(start_column:end_column, i))) > 1
+            [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = wien_sine(x(start_column:end_column)',sr_sample(start_column:end_column,i));
+        else
+            [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:, i)] = deal(NaN);
+        end
     end
 
 % If Planck is selected from the drop-down menu
 else
     for i=1:numRows
-        
         x = wavelengths';
-
-        [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = planck(c1, c2, wavelengths(start_column:end_column)',sr_sample(start_column:end_column,i));
-
+        if sum(~isnan(sr_sample(start_column:end_column, i))) > 1
+            [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:,i)] = planck(c1, c2, wavelengths(start_column:end_column)',sr_sample(start_column:end_column,i));
+        else
+            [T(i), sigT(i), E(i), sigE(i), SSD(i), y_fit(:, i)] = deal(NaN);
+        end
     end
 end
     
 % If T correction radiobutton selected
 if get(handles.radiobutton_T_correction,'Value') == 1
-
     for i=1:numRows
         % Determine corrected temperature based on Walter & Koga (2004)
         T(i)=T(i) - (-0.0216*(sigT(i)*sigT(i))+17.882*sigT(i)); 
@@ -121,12 +136,11 @@ if get(handles.radiobutton_T_correction,'Value') == 1
 end
 
 % Apply error trimming
+min_error_range = 10.0;  % Define a minimum range threshold below which trimming is skipped or softened
 error_range = max(sigT) - min(sigT);
-error_cutoff = ((1 - get(handles.slider_error_trim,'Value')) * error_range) + min(sigT);
-
+effective_error_range = max(error_range, min_error_range);
+error_cutoff = ((1 - get(handles.slider_error_trim,'Value')) * effective_error_range) + min(sigT);
 sigT(sigT > error_cutoff) = NaN;
 T(isnan(sigT)) = NaN;
 E(isnan(sigT)) = NaN;
 sigE(isnan(sigT)) = NaN;
-
-end
