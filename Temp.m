@@ -66,13 +66,22 @@ numRows = size(sr_sample, 2);
 [T, sigT, E, sigE, SSD] = deal(zeros(1, numRows));
 y_fit = zeros(length(start_column:end_column), numRows);
 
+% Compute row-wise maxima
+row_maxima = max(sr_sample, [], 1);  % 1 row per pixel (column-wise max)
+
+% Redefine S/N range using min/max of row-wise maxima
+sn_min = min(row_maxima);
+sn_max = max(row_maxima);
+sn_range = sn_max - sn_min;
+
+% Compute cutoff using GUI slider value
+sn_cutoff = get(handles.slider_sn_trim, 'Value') * sn_range + sn_min;
+
 % Apply S/N trimming
-sn_range = max(sr_sample(:)) - min(sr_sample(:));
-sn_cutoff = (get(handles.slider_sn_trim,'Value') * sn_range) + min(sr_sample(:));
 for r = mnrow:mxrow
-    row_data = sr_sample(:, r - mnrow + 1);
-    if max(row_data) < sn_cutoff
-        sr_sample(:, r - mnrow + 1) = NaN;
+    col_index = r - mnrow + 1;
+    if row_maxima(col_index) < sn_cutoff
+        sr_sample(:, col_index) = NaN;
     end
 end
 
@@ -136,11 +145,12 @@ if get(handles.radiobutton_T_correction,'Value') == 1
 end
 
 % Apply error trimming
-min_error_range = 10.0;  % Define a minimum range threshold below which trimming is skipped or softened
-error_range = max(sigT) - min(sigT);
+trim_sigT = log(sigT);
+min_error_range = 0;  % Define a minimum range threshold below which trimming is skipped or softened
+error_range = max(trim_sigT) - min(trim_sigT);
 effective_error_range = max(error_range, min_error_range);
-error_cutoff = ((1 - get(handles.slider_error_trim,'Value')) * effective_error_range) + min(sigT);
-sigT(sigT > error_cutoff) = NaN;
+error_cutoff = ((1 - get(handles.slider_error_trim,'Value')) * effective_error_range) + min(trim_sigT);
+sigT(trim_sigT > error_cutoff) = NaN;
 T(isnan(sigT)) = NaN;
 E(isnan(sigT)) = NaN;
 sigE(isnan(sigT)) = NaN;
