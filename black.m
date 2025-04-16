@@ -503,7 +503,7 @@ end
 
 % Calculate experiment statistics once post-processing is complete
 if get(handles.pushbutton_live,'Value') == 0 && get(handles.radiobutton_save_output,'Value') == 1
-    experiment_stats(fullfile(unkmat.path, folder, 'SUMMARY.txt'));
+    experiment_stats(fullfile(unkmat.path, folder, 'SUMMARY.txt'), handles);
 end
 
 % PUSHBUTTON ROTATE ---------------------------------------------------------------------------------------------------------

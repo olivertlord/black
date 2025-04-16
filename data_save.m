@@ -87,13 +87,23 @@ if fid == -1
 end
 
 % Prepare and write header
-header = sprintf('%-20s%-15s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n', ...
-                      'Filename', 'Timestamp', 'Elapsed', 'Max L', 'E Max L', 'Min L', ...
-                      'E Min L', 'Mean L', 'E Mean L', 'Max R', 'E Max R', ...
-                      'Min R', 'E Min R', 'Mean R', 'E Mean R');
-fprintf(fid, header);
-fprintf('\n');
-fprintf(header);
+title = 'Temperature data';
+title_underline = repmat('-', 1, length(title));  
+
+header = sprintf('%-20s%-15s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s%-10s', ...
+                 'Filename', 'Timestamp', 'Elapsed', 'Max L', 'E Max L', 'Min L', ...
+                 'E Min L', 'Mean L', 'E Mean L', 'Max R', 'E Max R', ...
+                 'Min R', 'E Min R', 'Mean R', 'E Mean R');
+
+% Print to file
+fprintf(fid, '%s\n', title);
+fprintf(fid, '%s\n', title_underline);
+fprintf(fid, '%s\n', header);
+
+% Also print to command line
+fprintf('\n%s\n%s\n%s\n', title, title_underline, header);
+
+% Close the file
 fclose(fid);
 end
 
