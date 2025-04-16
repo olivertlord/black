@@ -67,7 +67,7 @@ numRows = size(sr_sample, 2);
 y_fit = zeros(length(start_column:end_column), numRows);
 
 % Compute row-wise maxima
-row_maxima = max(sr_sample, [], 1);  % 1 row per pixel (column-wise max)
+row_maxima = log(max(sr_sample, [], 1));  % 1 row per pixel (column-wise max)
 
 % Redefine S/N range using min/max of row-wise maxima
 sn_min = min(row_maxima);
