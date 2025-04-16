@@ -13,6 +13,6 @@ minimum_err = error(idx);
 % Compute weighted mean and uncertainty
 weights = 1 ./ (error.^2);
 weighted_mean = sum(value .* weights, 'omitnan') / sum(weights, 'omitnan');
-weighted_mean_err = ((1 / sum(weights, 'omitnan')) * sqrt(sum((weights .* error).^2, 'omitnan'))) + mean(error, 'omitnan');
-
+%weighted_mean_err = ((1 / sum(weights, 'omitnan')) * sqrt(sum((weights .* error).^2, 'omitnan'))) + mean(error, 'omitnan');
+weighted_mean_err = std(value,'omitnan')*2;
 end
