@@ -4,7 +4,7 @@ function [maximum, maximum_err, minimum, minimum_err, weighted_mean, weighted_me
 value = double(value);
 error = double(error);
 
-% Compute minima and maxima
+% Find minimum and maximum temperatures and their errors
 [maximum, idx] = max(value);
 maximum_err = error(idx);
 [minimum, idx] = min(value);

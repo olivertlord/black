@@ -34,8 +34,8 @@ function [] = fit_prep(handles, file_path, output_folder, unkdata, caldata_l, ca
 if get(handles.radiobutton_auto_rotate,'Value') == 1
             
     rots = load('rotfile.mat');
-    unkl = imrotate(unkdata,-rots.tilt_L,'bicubic');
-    unkr = imrotate(unkdata,-rots.tilt_R,'bicubic');
+    unkr = imrotate(unkdata,-rots.tilt_L,'bicubic');
+    unkl = imrotate(unkdata,-rots.tilt_R,'bicubic');
 else
     [unkl,unkr]=deal(unkdata);
 end

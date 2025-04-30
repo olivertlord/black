@@ -110,7 +110,6 @@ if errorMinType == 4
     end
     
     % Find minimum error indices
-
     [~, idxl] = min(max_el);
     [~, idxr] = min(max_er);
 
@@ -120,6 +119,46 @@ if errorMinType == 4
     data_load('calibration.mat', 'name_r', 'path', 'cal_r', 'wavelengths', '', handles.edit_calname_right, 'on',...
         true, calFilePathsRight{idxr}, calfileNamesRight{idxr});
 end
+
+% Find optimum rotation angles
+if errorMinType == 5
+    angles = -.2:.01:.2;  % degrees to try
+    mean_el = NaN(1, numel(angles));
+    mean_er = NaN(1, numel(angles));
+    
+    for k = 1:numel(angles)
+        angle = angles(k);
+        
+        % Rotate unknowns
+        unkl_rot = imrotate(unkl, angle, 'bilinear', 'crop');
+        unkr_rot = imrotate(unkr, angle, 'bilinear', 'crop');
+
+        % Fit temperatures
+        [Tl, el] = Temp(unkl_rot, caldata_l, hp.sr, wavelengths, mnll, mxll, mxrowl, mnrowl, handles);
+        [Tr, er] = Temp(unkr_rot, caldata_r, hp.sr, wavelengths, mnlr, mxlr, mxrowr, mnrowr, handles);
+
+        [~, ~, ~, ~, ~, mean_el(k)] = calc_temp_stats(Tl, el);
+        [~, ~, ~, ~, ~, mean_er(k)] = calc_temp_stats(Tr, er);
+
+    end
+
+    % Find best rotation angle
+    [~, bestIdxL] = min(mean_el);
+    [~, bestIdxR] = min(mean_er);
+    tilt_L = angles(bestIdxL);
+    tilt_R = angles(bestIdxR);
+
+    % Save tilt angles to .MAT file
+    save('rotfile.mat', 'tilt_L', 'tilt_R');
+
+    % Plot error minimisation data
+    plotErrorMinimisationData(handles, angles, errorMinType, [], [], [], mean_el, mean_er);
+
+end
+
+% Reset error minimisation dropdown
+set(handles.popupmenu_error_min_type, 'Value', 1);
+
 end
 
 % HELPER FUNCTION: generatePixelData ----------------------------------------------------------------------------------------
@@ -173,20 +212,27 @@ end
 end
 
 % HELPER FUNCTION: plotErrorMinimisationData --------------------------------------------------------------------------------
-function plotErrorMinimisationData(handles, wavelengths, errorMinType, spix, sw, ww, ael, aer)
+function plotErrorMinimisationData(handles, x, errorMinType, spix, sw, ww, yl, yr)
 if errorMinType == 2
-    plot(handles.plot_emin_left, wavelengths(spix), ael, 'Color', 'r', 'LineWidth', 2);
+    plot(handles.plot_emin_left, x(spix), yl, 'Color', 'r', 'LineWidth', 2);
     update_axes(handles.plot_emin_left, 'Start Wavelength (nm)', 'Average Error (K)', 'Error Min Left', 'Right', 1, 1);
 
-    plot(handles.plot_emin_right, wavelengths(spix), aer, 'Color', 'g', 'LineWidth', 2);
+    plot(handles.plot_emin_right, x(spix), yr, 'Color', 'g', 'LineWidth', 2);
     update_axes(handles.plot_emin_right, 'Start Wavelength (nm)', 'Average Error (K)', 'Error Min Right', 'Right', 1, 1);
 
 elseif errorMinType == 3
-    imagesc(handles.plot_emin_left, ww, sw, 1 ./ ael);
+    imagesc(handles.plot_emin_left, ww, sw, 1 ./ yl);
     update_axes(handles.plot_emin_left, 'Start Wavelength (nm)', '', 'Error Min Left', 'Right', 1, 0, sw(1), sw(end), ww(1), ww(end));
 
-    imagesc(handles.plot_emin_right, ww, sw, 1 ./ aer);
+    imagesc(handles.plot_emin_right, ww, sw, 1 ./ yr);
     update_axes(handles.plot_emin_right, 'Start Wavelength (nm)', 'Window Width (nm)', 'Error Min Right', 'Right', 1, 0, sw(1), sw(end), ww(1), ww(end));
+
+elseif errorMinType == 5
+    plot(handles.plot_emin_left, x, yl, 'Color', 'r', 'LineWidth', 2);
+    update_axes(handles.plot_emin_left, 'Angle', 'Average Error (K)', 'Error Min Left', 'Right', 1, 1);
+
+    plot(handles.plot_emin_right, x, yr, 'Color', 'g', 'LineWidth', 2);
+    update_axes(handles.plot_emin_right, 'Angle', 'Average Error (K)', 'Error Min Right', 'Right', 1, 1);
 end
 end
 

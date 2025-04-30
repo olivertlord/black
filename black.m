@@ -505,10 +505,6 @@ end
 if get(handles.pushbutton_live,'Value') == 0 && get(handles.radiobutton_save_output,'Value') == 1
     experiment_stats(fullfile(unkmat.path, folder, 'SUMMARY.txt'), handles);
 end
-
-% PUSHBUTTON ROTATE ---------------------------------------------------------------------------------------------------------
-function pushbutton_rotate_Callback(~, ~, handles)
-rotate(handles);
     
 % PUSHBUTTON CLEAR FIGURES --------------------------------------------------------------------------------------------------
 function pushbutton_clear_figures_Callback(~, ~, handles)

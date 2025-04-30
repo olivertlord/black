@@ -72,5 +72,14 @@ elseif endsWith(filename, '.spe', 'IgnoreCase', true)
 
 end
 
+% Ensure calibration files are correctly oriented
+top_half_sum = sum(matFileData.(field_3)(:, 1:128), 'all');
+bottom_half_sum = sum(matFileData.(field_3)(:, 129:end), 'all');
+if strcmp(field_3, 'cal_l') && bottom_half_sum > top_half_sum
+    matFileData.(field_3) = fliplr(matFileData.(field_3));
+elseif strcmp(field_3, 'cal_r') && bottom_half_sum < top_half_sum
+    matFileData.(field_3) = fliplr(matFileData.(field_3));
+end
+
 % Save matfile
 save(matFileName, '-struct', 'matFileData', '-v7.3');
